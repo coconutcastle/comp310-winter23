@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dirent.h>
+#include <ctype.h>
 #include "shellmemory.h"
 #include "shell.h"
 
@@ -25,14 +27,35 @@ int badcommandTooManyTokens()
   return 4; // return int 4 for now
 }
 
+int badcommand_my_mkdir()
+{
+  printf("%s\n", "Bad command: my_mkdir");
+  return 5;
+}
+
+int badcommand_my_cd()
+{
+  printf("%s\n", "Bad command: my_cd");
+  return 6;
+}
+
 int help();
 int quit();
+
 int set(char *command_args[], int args_size);
 int echo(char *varStr);
+int my_ls();
+int my_mkdir(char *dirname);
+int my_touch(char *filename);
+int my_cd(char *rel_path);
+
 int print(char *var);
 int run(char *script);
+
 int badcommandFileDoesNotExist();
 int badCommandTooManyTokens();
+int badcommand_my_mkdir();
+int badcommand_my_cd();
 
 // Interpret commands and their arguments
 int interpreter(char *command_args[], int args_size)
@@ -76,6 +99,13 @@ int interpreter(char *command_args[], int args_size)
     if (args_size != 2)
       return badcommand();
     return echo(command_args[1]);
+  }
+  else if (strcmp(command_args[0], "my_ls") == 0)
+  {
+    // my_ls
+    if (args_size != 1)
+      return badcommand();
+    return my_ls();
   }
   else if (strcmp(command_args[0], "print") == 0)
   {
@@ -151,6 +181,77 @@ int echo(char *varStr)
   else
   {
     printf("%s\n", varStr);
+  }
+  return 0;
+}
+
+int dirname_comp(const void *a, const void *b)
+{
+  // return tolower(*(const char**)a) - tolower(*(const char**)b);
+
+  return strcmp(*(const char **)a, *(const char **)b);
+}
+
+// int dirname_comp(char a, char b )
+// {
+//   return tolower(a) - tolower(b);
+//   // return strcmp( *(const char**)a, *(const char**)b );
+// }
+
+int my_ls()
+{
+  DIR *curr_directory;
+  struct dirent *dir;
+  curr_directory = opendir(".");
+
+  // assumes that there will be no more than 100 files/folders per directory
+  // assumes that each file/folder name is < 100 characters
+  const char *dir_names[100];
+  int num_dir_children = 0;
+  int i = 0;
+
+  if (curr_directory)
+  {
+    while ((dir = readdir(curr_directory)) != NULL)
+    {
+      // add all directory file/folder names to string array
+      if (!(strcmp(dir->d_name, ".") || strcmp(dir->d_name, "..")))   // ignore . and ..
+      {
+        dir_names[i] = dir->d_name;
+        num_dir_children++;
+      }
+      i++;
+    }
+    closedir(curr_directory);
+
+    qsort(dir_names, num_dir_children, sizeof(dir_names[0]), dirname_comp);
+
+    for (int n = 0; n < num_dir_children; n++)
+    {
+      printf("%s\n", dir_names[n]);
+    }
+  }
+
+  return 0;
+}
+
+int my_mkdir(char *dirname)
+{
+  return 0;
+}
+
+int my_touch(char *filename)
+{
+  FILE *newfile = fopen(filename, "w");
+  fclose(newfile);
+  return 0;
+}
+
+int my_cd(char *rel_path)
+{
+  if (chdir(rel_path) != 0)
+  {
+    return badcommand_my_cd();
   }
   return 0;
 }
