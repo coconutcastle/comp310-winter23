@@ -107,6 +107,27 @@ int interpreter(char *command_args[], int args_size)
       return badcommand();
     return my_ls();
   }
+  else if (strcmp(command_args[0], "my_mkdir") == 0)
+  {
+    // my_ls
+    if (args_size != 2)
+      return badcommand();
+    return my_mkdir(command_args[1]);
+  }
+  else if (strcmp(command_args[0], "my_touch") == 0)
+  {
+    // my_ls
+    if (args_size != 2)
+      return badcommand();
+    return my_touch(command_args[1]);
+  }
+  else if (strcmp(command_args[0], "my_cd") == 0)
+  {
+    // my_ls
+    if (args_size != 2)
+      return badcommand();
+    return my_cd(command_args[1]);
+  }
   else if (strcmp(command_args[0], "print") == 0)
   {
     if (args_size != 2)
@@ -215,7 +236,7 @@ int my_ls()
     while ((dir = readdir(curr_directory)) != NULL)
     {
       // add all directory file/folder names to string array
-      if (!(strcmp(dir->d_name, ".") || strcmp(dir->d_name, "..")))   // ignore . and ..
+      if (!(strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0)) // ignore . and ..
       {
         dir_names[i] = dir->d_name;
         num_dir_children++;
@@ -237,6 +258,23 @@ int my_ls()
 
 int my_mkdir(char *dirname)
 {
+  if (dirname[0] == '$')
+  {
+    char *memDirname = mem_get_value(dirname + 1);
+    if (strcmp(memDirname, "Variable does not exist") != 0)
+    {
+      mkdir(memDirname, 0700);
+    }
+    else
+    {
+      return badcommand_my_mkdir();
+    }
+  }
+  else
+  {
+    // create new directory
+    mkdir(dirname, 0700);
+  }
   return 0;
 }
 
