@@ -4,7 +4,7 @@
 #include "shellmemory.h"
 #include "shell.h"
 
-int MAX_ARGS_SIZE = 7;    // assuming you won't get more than 7 arguments
+int MAX_ARGS_SIZE = 7; // assuming you won't get more than 7 arguments
 
 int badcommand()
 {
@@ -28,6 +28,7 @@ int badcommandTooManyTokens()
 int help();
 int quit();
 int set(char *command_args[], int args_size);
+int echo(char *varStr);
 int print(char *var);
 int run(char *script);
 int badcommandFileDoesNotExist();
@@ -69,6 +70,13 @@ int interpreter(char *command_args[], int args_size)
       return badcommand();
     return set(command_args, args_size);
   }
+  else if (strcmp(command_args[0], "echo") == 0)
+  {
+    // echo
+    if (args_size != 2)
+      return badcommand();
+    return echo(command_args[1]);
+  }
   else if (strcmp(command_args[0], "print") == 0)
   {
     if (args_size != 2)
@@ -104,29 +112,17 @@ int quit()
   exit(0);
 }
 
-// extend set to support at most 5 alphanumeric tokens
-// if more tokens for value, shell will not set value and return error
 // assigns a value to shell memory
 int set(char *command_args[], int args_size)
 {
-  // printf("%lu\n", sizeof(strlen(*command_args)/sizeof(command_args[0])));
-  for (int i = 0; i < args_size; i++)
-  {
-    printf("%s\n", command_args[i]);
-  }
-
   // maximum 5 tokens, tokens maximum 100 chars
-  char *buffer = (char *) malloc((100 * 5) * sizeof(char));
-  char *link = "=";
+  char *buffer = (char *)malloc(100 * 5 * sizeof(char));
   char *space = " ";
-  // char buffer[1000];
-
-  // strcpy(buffer, command_args[1]);
-  // strcat(buffer, link);
 
   for (int i = 2; i < args_size; i++)
   {
-    if (i != 2) {
+    if (i != 2)
+    {
       strcat(buffer, space);
     }
     strcat(buffer, command_args[i]);
@@ -134,6 +130,28 @@ int set(char *command_args[], int args_size)
 
   mem_set_value(command_args[1], buffer);
 
+  return 0;
+}
+
+int echo(char *varStr)
+{
+  if (varStr[0] == '$')
+  {
+    char *memValue = mem_get_value(varStr + 1);
+
+    if (strcmp(memValue, "Variable does not exist") != 0)
+    {
+      printf("%s\n", memValue);
+    }
+    else
+    {
+      printf("%s", "\n");
+    }
+  }
+  else
+  {
+    printf("%s\n", varStr);
+  }
   return 0;
 }
 
