@@ -18,12 +18,15 @@ int main(int argc, char *argv[])
 	char userInput[MAX_USER_INPUT]; // user's input stored here
 	int errorCode = 0;				// zero means no error, default
 
-	// init user input
-	for (int i = 0; i < MAX_USER_INPUT; i++)
+	// for one-liners
+	// code inspiration taken from https://www.tutorialspoint.com/c_standard_library/c_function_strtok.htm
+	const char *semicolon = ";";
+	char *input_token; 				// pointer to first token (semicolon-deliminated) in user input
+
+	for (int i = 0; i < MAX_USER_INPUT; i++)	// init user input
 		userInput[i] = '\0';
 
-	// init shell memory
-	mem_init();
+	mem_init();		// init shell memory
 
 	// ./mysh < ../testcases/assignment1/echo.txt
 	while (1)
@@ -42,13 +45,19 @@ int main(int argc, char *argv[])
 			// continue;
 		}
 
-		// here you should check the unistd library
-		// so that you can find a way to not display $ in the batch mode
+		// when stdin is written to userinput, userinput is filled with the entered command line
 		fgets(userInput, MAX_USER_INPUT - 1, stdin);
-		errorCode = parseInput(userInput);
-		if (errorCode == -1)
-			exit(99); // ignore all other errors
-		memset(userInput, 0, sizeof(userInput));
+
+		// split user input by semicolons and execute each as a separate command
+		input_token = strtok(userInput, semicolon);
+		while (input_token != NULL)
+		{
+			errorCode = parseInput(input_token);
+			if (errorCode == -1)
+				exit(99); // ignore all other errors
+			memset(input_token, 0, sizeof(input_token));
+			input_token = strtok(NULL, semicolon);
+		}
 	}
 
 	return 0;

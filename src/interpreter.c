@@ -221,6 +221,8 @@ int dirname_comp(const void *a, const void *b)
 //   // return strcmp( *(const char**)a, *(const char**)b );
 // }
 
+// lists all files and folders in current working directory
+// code inspiration taken from https://stackoverflow.com/questions/4204666/how-to-list-files-in-a-directory-in-a-c-program
 int my_ls()
 {
 	DIR *curr_directory;
@@ -229,7 +231,7 @@ int my_ls()
 
 	// assumes that there will be no more than 100 files/folders per directory
 	// assumes that each file/folder name is < 100 characters
-	const char *dir_names[100];
+	const char *dir_names[100 * 100];
 	int num_dir_children = 0;
 	int i = 0;
 
@@ -260,7 +262,7 @@ int my_ls()
 
 int my_mkdir(char *dirname)
 {
-	if (dirname[0] == '$')
+	if (dirname[0] == '$')		// argument is variable
 	{
 		char *memDirname = mem_get_value(dirname + 1);
 		if (strcmp(memDirname, "Variable does not exist") != 0)
@@ -272,14 +274,14 @@ int my_mkdir(char *dirname)
 			return badcommand_my_mkdir();
 		}
 	}
-	else
+	else	// argument is string, use as new directory name
 	{
-		// create new directory
 		mkdir(dirname, 0700);
 	}
 	return 0;
 }
 
+// create a new file in the current working directory with the given filename
 int my_touch(char *filename)
 {
 	FILE *newfile = fopen(filename, "w");
@@ -287,6 +289,7 @@ int my_touch(char *filename)
 	return 0;
 }
 
+// navigate directory with relative paths
 int my_cd(char *rel_path)
 {
 	if (chdir(rel_path) != 0)
