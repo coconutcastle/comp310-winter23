@@ -8,6 +8,8 @@ This code uses the starter code from [the project repository](https://gitlab.cs.
 
 Note that due to using a separate project repository than the one originally submitted and having it be corrected very late, the autograder has never successfully found this repository. Therefore, I cannot say for certain that there will be no compilation errors/warnings or issues that arise remotely not not locally. 
 
+There are some memory leakage issues due to uses of `strdup()` in the starter code.
+
 ## To Run
 
 ### Compilation

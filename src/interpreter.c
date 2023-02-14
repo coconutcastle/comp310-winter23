@@ -217,7 +217,16 @@ int echo(char *varStr)
 
 int dirname_comp(const void *a, const void *b)
 {
+	// char *str1[] = *(const char **)a;
+	// char *str2[] = *(const char **)b;
+	// char *str1;
+	// char *str2;
+	// strcpy(str1, *(const char **)a);
+	// strcpy(str2, *(const char **)b);
+	// printf("%s and %s\n", str1, str2);
 	// return tolower(*(const char**)a) - tolower(*(const char**)b);
+	// if (tolower(*(const char **)a)[0] == tolower(*(const char **)b)[0])
+	printf("%c", (*(const char **)a)[0]);
 	return strcmp(*(const char **)a, *(const char **)b);
 }
 
