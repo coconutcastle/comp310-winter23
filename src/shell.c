@@ -8,11 +8,8 @@
 int MAX_USER_INPUT = 1000;
 int parseInput(char ui[]);
 
-// gcc -g shell.c interpreter.c shellmemory.c
-// valgrind --leak-check=full --show-leak-kinds=all ./a.out < ../testcases/assignment1/set.txt
-// ./mysh < ../testcases/assignment1/oneline2.txt
-
 // Start of everything
+// code for one-liners inspiration taken from https://www.tutorialspoint.com/c_standard_library/c_function_strtok.htm
 int main(int argc, char *argv[])
 {
 	printf("%s\n", "Shell version 1.2 Created January 2023");
@@ -23,7 +20,6 @@ int main(int argc, char *argv[])
 	int errorCode = 0;				// zero means no error, default
 
 	// for one-liners
-	// code inspiration taken from https://www.tutorialspoint.com/c_standard_library/c_function_strtok.htm
 	const char *semicolon = ";";
 	char *input_token; 				// pointer to first token (semicolon-deliminated) in user input
 
@@ -41,11 +37,10 @@ int main(int argc, char *argv[])
 		}
 
 		// file stream input ends
+		// currently does not reopen terminal after file ends, but it does prevent an infinite loop
 		if (feof(stdin))
 		{
 			break;
-			// fclose(stdin);
-			// continue;
 		}
 
 		// when stdin is written to userinput, userinput is filled with the entered command line

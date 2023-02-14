@@ -26,7 +26,7 @@ int badcommandFileDoesNotExist()
 int badCommandTooManyTokens()
 {
 	printf("%s\n", "Bad command: Too many tokens");
-	return 4; // return int 4 for now
+	return 4;
 }
 
 int badcommand_my_mkdir()
@@ -177,25 +177,25 @@ int set(char *command_args[], int args_size)
 	char *buffer = (char *)malloc(100 * 5 * sizeof(char));
 	char *space = " ";
 
-	for (int i = 2; i < args_size; i++)
+	for (int i = 2; i < args_size; i++)		// start loop after command and var
 	{
 		if (i != 2)
 		{
-			strcat(buffer, space);
+			strcat(buffer, space);			// add space before the next arg
 		}
 		strcat(buffer, command_args[i]);
 	}
 
 	mem_set_value(command_args[1], buffer);
 
-	// free(buffer);
+	// free(buffer);	// seemed to be causing some characters to get corrupted
 
 	return 0;
 }
 
 int echo(char *varStr)
 {
-	if (varStr[0] == '$')
+	if (varStr[0] == '$')		// arg is var, get value from memory
 	{
 		char *memValue = mem_get_value(varStr + 1);
 
@@ -205,10 +205,10 @@ int echo(char *varStr)
 		}
 		else
 		{
-			printf("%s", "\n");
+			printf("%s", "\n");		// newline if no value stored in given var
 		}
 	}
-	else
+	else		// arg is str
 	{
 		printf("%s\n", varStr);
 	}
@@ -221,7 +221,7 @@ int dirname_comp(const void *a, const void *b)
 	// and uppercase letters have lower ascii codes than lowercase
 	int return_cmp = strcmp(*(const char **)a, *(const char **)b);
 
-	if (isalpha((*(const char **)a)[0]) || isalpha((*(const char **)b)[0]))
+	if (isalpha((*(const char **)a)[0]) || isalpha((*(const char **)b)[0]))		// following comparisons only relevant for letter chars
 	{
 		// if starting with different letters, sort by lowercase
 		int lowercase_comp = tolower((*(const char **)a)[0]) - tolower((*(const char **)b)[0]);
@@ -230,7 +230,7 @@ int dirname_comp(const void *a, const void *b)
 			return_cmp = lowercase_comp;
 		}
 
-		// if starting with the same letters, lowercase first
+		// if starting with the same letters, uppercase first
 		int same_letter_case_comp = (*(const char **)a)[0] - (*(const char **)b)[0];
 		if ((lowercase_comp == 0) && (same_letter_case_comp != 0))
 		{
@@ -263,12 +263,14 @@ int my_ls()
 			}
 			if ((strcmp(dir->d_name, ".") == 0) || (strcmp(dir->d_name, "..") == 0))
 			{
-				continue; // ignore . and ..
+				continue; 	// ignore . and ..
 			}
 			// add all directory file/folder names to string array
 			dir_names[num_dir_children] = dir->d_name;
 			num_dir_children++;
 		}
+
+		// sort directory file/folder names
 		qsort(dir_names, num_dir_children, sizeof(char *), dirname_comp);
 
 		for (int n = 0; n < num_dir_children; n++)
@@ -276,21 +278,10 @@ int my_ls()
 			printf("%s\n", dir_names[n]);
 		}
 
-		closedir(curr_directory); // array accesses stop working if directory closed
+		closedir(curr_directory); 	// dir_names array accesses stop working if directory closed
 	}
 
 	return 0;
-}
-
-int sort_ls(char *dir_names[], int num_dir_children)
-{
-	// bubble sort
-	for (int i = 0; i < num_dir_children; i++)
-	{
-		for (int j = 0; j < num_dir_children; j++)
-		{
-		}
-	}
 }
 
 int my_mkdir(char *dirname)
@@ -315,6 +306,7 @@ int my_mkdir(char *dirname)
 }
 
 // create a new file in the current working directory with the given filename
+// code inspiration taken from https://stackoverflow.com/questions/34008206/how-to-create-a-new-text-file-in-c
 int my_touch(char *filename)
 {
 	FILE *newfile = fopen(filename, "w");
@@ -332,6 +324,7 @@ int my_cd(char *rel_path)
 	return 0;
 }
 
+//code inspiration taken from https://stackoverflow.com/questions/34046133/error-handling-mkdir-and-chdir-in-c
 int print(char *var)
 {
 	printf("%s\n", mem_get_value(var));

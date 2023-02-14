@@ -6,9 +6,11 @@
 
 This code uses the starter code from [the project repository](https://gitlab.cs.mcgill.ca/balmau/comp310-winter23).
 
-Note that due to using a separate project repository than the one originally submitted and having it be corrected very late, the autograder has never successfully found this repository. Therefore, I cannot say for certain that there will be no compilation errors/warnings or issues that arise remotely not not locally. 
+Note that due to using a separate project repository than the one originally submitted and having it be corrected very late, the autograder has never successfully found this repository. The issue was unfortunately not discovered until the last day. Therefore, while the local results seem correct, I cannot say for certain that there will be no compilation errors/warnings or issues that arise remotely but not locally. 
 
-There are some memory leakage issues due to uses of `strdup()` in the starter code.
+Some other things:
+- There are some memory leakage issues due to uses of `strdup()` in the starter code.
+- The current implementation closes the shell if a file does not end in "quit" in batch mode. It does not go to interactive mode, but it does prevent an infinite loop.
 
 ## To Run
 
