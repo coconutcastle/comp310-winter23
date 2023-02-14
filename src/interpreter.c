@@ -188,7 +188,7 @@ int set(char *command_args[], int args_size)
 
 	mem_set_value(command_args[1], buffer);
 
-	free(buffer);
+	// free(buffer);
 
 	return 0;
 }
@@ -217,24 +217,29 @@ int echo(char *varStr)
 
 int dirname_comp(const void *a, const void *b)
 {
-	// char *str1[] = *(const char **)a;
-	// char *str2[] = *(const char **)b;
-	// char *str1;
-	// char *str2;
-	// strcpy(str1, *(const char **)a);
-	// strcpy(str2, *(const char **)b);
-	// printf("%s and %s\n", str1, str2);
-	// return tolower(*(const char**)a) - tolower(*(const char**)b);
-	// if (tolower(*(const char **)a)[0] == tolower(*(const char **)b)[0])
-	printf("%c", (*(const char **)a)[0]);
-	return strcmp(*(const char **)a, *(const char **)b);
-}
+	// numbers have lower ascii codes than letters
+	// and uppercase letters have lower ascii codes than lowercase
+	int return_cmp = strcmp(*(const char **)a, *(const char **)b);
 
-// int dirname_comp(char a, char b )
-// {
-//   return tolower(a) - tolower(b);
-//   // return strcmp( *(const char**)a, *(const char**)b );
-// }
+	if (isalpha((*(const char **)a)[0]) || isalpha((*(const char **)b)[0]))
+	{
+		// if starting with different letters, sort by lowercase
+		int lowercase_comp = tolower((*(const char **)a)[0]) - tolower((*(const char **)b)[0]);
+		if (lowercase_comp != 0)
+		{
+			return_cmp = lowercase_comp;
+		}
+
+		// if starting with the same letters, lowercase first
+		int same_letter_case_comp = (*(const char **)a)[0] - (*(const char **)b)[0];
+		if ((lowercase_comp == 0) && (same_letter_case_comp != 0))
+		{
+			return_cmp = same_letter_case_comp;
+		}
+	}
+
+	return return_cmp;
+}
 
 // lists all files and folders in current working directory
 // code inspiration taken from https://stackoverflow.com/questions/4204666/how-to-list-files-in-a-directory-in-a-c-program
@@ -270,7 +275,7 @@ int my_ls()
 		{
 			printf("%s\n", dir_names[n]);
 		}
-		
+
 		closedir(curr_directory); // array accesses stop working if directory closed
 	}
 
