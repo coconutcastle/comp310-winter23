@@ -1,6 +1,7 @@
 # ECSE 427 Assignment 1 Code
 
 **Author:** Cecile Dai
+
 **McGill ID:** 260923343
 
 This code uses the starter code from [the project repository](https://gitlab.cs.mcgill.ca/balmau/comp310-winter23).

@@ -23,7 +23,7 @@ int badcommandFileDoesNotExist()
 	return 3;
 }
 
-int badcommandTooManyTokens()
+int badCommandTooManyTokens()
 {
 	printf("%s\n", "Bad command: Too many tokens");
 	return 4; // return int 4 for now
@@ -64,9 +64,13 @@ int interpreter(char *command_args[], int args_size)
 {
 	int i;
 
-	if (args_size < 1 || args_size > MAX_ARGS_SIZE)
+	if (args_size < 1)
 	{
 		return badcommand();
+	}
+	if (args_size > MAX_ARGS_SIZE)
+	{
+		return badCommandTooManyTokens();
 	}
 
 	for (i = 0; i < args_size; i++)
@@ -111,23 +115,23 @@ int interpreter(char *command_args[], int args_size)
 	}
 	else if (strcmp(command_args[0], "my_mkdir") == 0)
 	{
-		// my_ls
+		// my_mkdir
 		if (args_size != 2)
-			return badcommand();
+			return badcommand_my_mkdir();
 		return my_mkdir(command_args[1]);
 	}
 	else if (strcmp(command_args[0], "my_touch") == 0)
 	{
-		// my_ls
+		// my_touch
 		if (args_size != 2)
 			return badcommand();
 		return my_touch(command_args[1]);
 	}
 	else if (strcmp(command_args[0], "my_cd") == 0)
 	{
-		// my_ls
+		// my_cd
 		if (args_size != 2)
-			return badcommand();
+			return badcommand_my_cd();
 		return my_cd(command_args[1]);
 	}
 	else if (strcmp(command_args[0], "print") == 0)
@@ -265,7 +269,7 @@ int my_mkdir(char *dirname)
 	if (dirname[0] == '$')		// argument is variable
 	{
 		char *memDirname = mem_get_value(dirname + 1);
-		if (strcmp(memDirname, "Variable does not exist") != 0)
+		if ((strcmp(memDirname, "Variable does not exist") != 0) && (strchr(memDirname, ' ') == NULL))		// check that var exists and is single token
 		{
 			mkdir(memDirname, 0700);
 		}
