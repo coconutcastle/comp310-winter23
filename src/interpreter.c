@@ -50,6 +50,7 @@ int my_ls();
 int my_mkdir(char *dirname);
 int my_touch(char *filename);
 int my_cd(char *rel_path);
+int dirname_comp(const void *a, const void *b);
 
 int print(char *var);
 int run(char *script);
@@ -187,6 +188,8 @@ int set(char *command_args[], int args_size)
 
 	mem_set_value(command_args[1], buffer);
 
+	free(buffer);
+
 	return 0;
 }
 
@@ -215,7 +218,6 @@ int echo(char *varStr)
 int dirname_comp(const void *a, const void *b)
 {
 	// return tolower(*(const char**)a) - tolower(*(const char**)b);
-
 	return strcmp(*(const char **)a, *(const char **)b);
 }
 
@@ -229,47 +231,60 @@ int dirname_comp(const void *a, const void *b)
 // code inspiration taken from https://stackoverflow.com/questions/4204666/how-to-list-files-in-a-directory-in-a-c-program
 int my_ls()
 {
-	DIR *curr_directory;
+	DIR *curr_directory = opendir(".");
 	struct dirent *dir;
-	curr_directory = opendir(".");
-
-	// assumes that there will be no more than 100 files/folders per directory
-	// assumes that each file/folder name is < 100 characters
-	const char *dir_names[100 * 100];
-	int num_dir_children = 0;
-	int i = 0;
 
 	if (curr_directory)
 	{
+		// assumes that there will be no more than 100 files/folders per directory
+		// assumes that each file/folder name is < 100 characters
+		char *dir_names[100 * 100];
+		int num_dir_children = 0;
+
 		while ((dir = readdir(curr_directory)) != NULL)
 		{
-			// add all directory file/folder names to string array
-			if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0) // ignore . and ..
+			if (num_dir_children == 99)
 			{
-				dir_names[i] = dir->d_name;
-				num_dir_children++;
-				i++;
+				break;
 			}
+			if ((strcmp(dir->d_name, ".") == 0) || (strcmp(dir->d_name, "..") == 0))
+			{
+				continue; // ignore . and ..
+			}
+			// add all directory file/folder names to string array
+			dir_names[num_dir_children] = dir->d_name;
+			num_dir_children++;
 		}
-		closedir(curr_directory);
-
-		qsort(dir_names, num_dir_children, sizeof(dir_names[0]), dirname_comp);
+		qsort(dir_names, num_dir_children, sizeof(char *), dirname_comp);
 
 		for (int n = 0; n < num_dir_children; n++)
 		{
 			printf("%s\n", dir_names[n]);
 		}
+		
+		closedir(curr_directory); // array accesses stop working if directory closed
 	}
 
 	return 0;
 }
 
+int sort_ls(char *dir_names[], int num_dir_children)
+{
+	// bubble sort
+	for (int i = 0; i < num_dir_children; i++)
+	{
+		for (int j = 0; j < num_dir_children; j++)
+		{
+		}
+	}
+}
+
 int my_mkdir(char *dirname)
 {
-	if (dirname[0] == '$')		// argument is variable
+	if (dirname[0] == '$') // argument is variable
 	{
 		char *memDirname = mem_get_value(dirname + 1);
-		if ((strcmp(memDirname, "Variable does not exist") != 0) && (strchr(memDirname, ' ') == NULL))		// check that var exists and is single token
+		if ((strcmp(memDirname, "Variable does not exist") != 0) && (strchr(memDirname, ' ') == NULL)) // check that var exists and is single token
 		{
 			mkdir(memDirname, 0700);
 		}
@@ -278,7 +293,7 @@ int my_mkdir(char *dirname)
 			return badcommand_my_mkdir();
 		}
 	}
-	else	// argument is string, use as new directory name
+	else // argument is string, use as new directory name
 	{
 		mkdir(dirname, 0700);
 	}

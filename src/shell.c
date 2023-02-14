@@ -8,6 +8,10 @@
 int MAX_USER_INPUT = 1000;
 int parseInput(char ui[]);
 
+// gcc -g shell.c interpreter.c shellmemory.c
+// valgrind --leak-check=full --show-leak-kinds=all ./a.out < ../testcases/assignment1/set.txt
+// ./mysh < ../testcases/assignment1/oneline2.txt
+
 // Start of everything
 int main(int argc, char *argv[])
 {
@@ -28,7 +32,6 @@ int main(int argc, char *argv[])
 
 	mem_init();		// init shell memory
 
-	// ./mysh < ../testcases/assignment1/echo.txt
 	while (1)
 	{
 		// check if commands are from file (batch) or terminal (interactive)
