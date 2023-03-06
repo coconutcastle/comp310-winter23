@@ -375,7 +375,9 @@ int exec(char *commands[], int num_commands)
     }
   }
 
-  struct PCBreadyqueue *pcb_rq;
+  // create ready queue
+  struct PCBreadyqueue *pcb_rq = create_ready_queue(num_processes);
+  
   char rel_path_to_folder[] = "../testcases/assignment2/";
 
   int i;
@@ -394,9 +396,6 @@ int exec(char *commands[], int num_commands)
     {
       return badcommandFileDoesNotExist();
     }
-
-    // create ready queue
-    pcb_rq = create_ready_queue(3);
 
     // create PCB
     struct PCB *pcb = create_PCB(i, p);

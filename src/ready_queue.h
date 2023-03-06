@@ -20,5 +20,6 @@ int is_empty(struct PCBreadyqueue* queue);
 int is_full(struct PCBreadyqueue* queue);
 int run_ready_queue(struct PCBreadyqueue* queue, char *policy);
 int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue);
+int remove_script(struct PCB pcb);
 
 #endif

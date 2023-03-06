@@ -34,7 +34,7 @@ struct PCB *create_PCB(int pid, FILE *commandLines)
     command = strtok(line, "\n");
     while (command != NULL)
     {
-      // printf("current command is: %s\n", command);
+      printf("creating command: %s\n", command);
       // memory key will be <pid>-<#instruction>
       // find specific instruction by pcb start + instruction index
       char mem_key[100];

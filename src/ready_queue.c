@@ -24,9 +24,9 @@ int enqueue(struct PCBreadyqueue *queue, struct PCB new_pcb)
 {
   if (is_full(queue))
     return -1;
-  queue->queue_end = (queue->queue_end + 1) % queue->capacity;
-  queue->queue_array[queue->queue_end] = new_pcb;
-  queue->size = queue->size + 1;
+  queue -> queue_end = (queue -> queue_end + 1) % queue -> capacity;
+  queue -> queue_array[queue -> queue_end] = new_pcb;
+  queue -> size = queue -> size + 1;
 
   return 0;
 }
@@ -36,9 +36,9 @@ struct PCB dequeue(struct PCBreadyqueue *queue)
 {
   if (is_empty(queue))
     printf("Queue is empty");
-  struct PCB pcb_to_remove = queue->queue_array[queue->queue_start];
-  queue->queue_start = (queue->queue_start + 1) % queue->capacity;
-  queue->size = queue->size - 1;
+  struct PCB pcb_to_remove = queue -> queue_array[queue->queue_start];
+  queue -> queue_start = (queue -> queue_start + 1) % queue -> capacity;
+  queue -> size = queue -> size - 1;
 
   return pcb_to_remove;
 }
@@ -48,7 +48,7 @@ struct PCB peek_front(struct PCBreadyqueue *queue)
 {
   if (is_empty(queue))
     printf("Queue is empty");
-  return queue->queue_array[queue->queue_start];
+  return queue -> queue_array[queue -> queue_start];
 }
 
 // look at last element in queue without removing
@@ -56,19 +56,19 @@ struct PCB peek_end(struct PCBreadyqueue *queue)
 {
   if (is_empty(queue))
     printf("Queue is empty");
-  return queue->queue_array[queue->queue_end];
+  return queue -> queue_array[queue -> queue_end];
 }
 
 // check if queue is empty
 int is_empty(struct PCBreadyqueue *queue)
 {
-  return (queue->size == 0);
+  return (queue -> size == 0);
 }
 
 // check if queue is full
 int is_full(struct PCBreadyqueue *queue)
 {
-  return (queue->size == queue->capacity);
+  return (queue -> size == queue -> capacity);
 }
 
 // run ready queue with either first come first serve (FCFS), round robin (RR), shortest job first (SJF)
@@ -87,7 +87,15 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
     int i;
     while (!is_empty(queue))
     {
-      run_PCB_FCFS(peek_front(queue), queue);
+      struct PCB curr_pcb = peek_front(queue);
+      run_PCB_FCFS(curr_pcb, queue);
+      dequeue(queue);
+      remove_script(curr_pcb);
+
+      // printf("dequeued %d\n", curr_pcb.pid);
+
+      // printf("shell memory is:\n");
+      // show_memory();
     }
   }
 
@@ -131,11 +139,17 @@ int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
     curr_instr_index++;
   }
 
-  if (curr_instr_index == pcb.num_instructions)
-  {
-    pcb.current_instruction = curr_instr_index;
-    struct PCB removed_pcb = dequeue(queue);
-  }
+  pcb.current_instruction = curr_instr_index;
+
+  // if (curr_instr_index == pcb.num_instructions)
+  // {
+  //   pcb.current_instruction = curr_instr_index;
+  //   struct PCB removed_pcb = dequeue(queue);
+  //   remove_script(removed_pcb);
+  // }
+
+  // printf("shell memory is:\n");
+  // show_memory();
 
   return 0;
 }
@@ -144,4 +158,5 @@ int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
 int remove_script(struct PCB pcb)
 {
   mem_clean_out_block(pcb.script_location_start, pcb.num_instructions);
+  return 0;
 }
