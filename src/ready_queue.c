@@ -24,9 +24,9 @@ int enqueue(struct PCBreadyqueue *queue, struct PCB new_pcb)
 {
   if (is_full(queue))
     return -1;
-  queue -> queue_end = (queue -> queue_end + 1) % queue -> capacity;
-  queue -> queue_array[queue -> queue_end] = new_pcb;
-  queue -> size = queue -> size + 1;
+  queue->queue_end = (queue->queue_end + 1) % queue->capacity;
+  queue->queue_array[queue->queue_end] = new_pcb;
+  queue->size = queue->size + 1;
 
   return 0;
 }
@@ -36,9 +36,9 @@ struct PCB dequeue(struct PCBreadyqueue *queue)
 {
   if (is_empty(queue))
     printf("Queue is empty");
-  struct PCB pcb_to_remove = queue -> queue_array[queue->queue_start];
-  queue -> queue_start = (queue -> queue_start + 1) % queue -> capacity;
-  queue -> size = queue -> size - 1;
+  struct PCB pcb_to_remove = queue->queue_array[queue->queue_start];
+  queue->queue_start = (queue->queue_start + 1) % queue->capacity;
+  queue->size = queue->size - 1;
 
   return pcb_to_remove;
 }
@@ -48,7 +48,7 @@ struct PCB peek_front(struct PCBreadyqueue *queue)
 {
   if (is_empty(queue))
     printf("Queue is empty");
-  return queue -> queue_array[queue -> queue_start];
+  return queue->queue_array[queue->queue_start];
 }
 
 // look at last element in queue without removing
@@ -56,19 +56,45 @@ struct PCB peek_end(struct PCBreadyqueue *queue)
 {
   if (is_empty(queue))
     printf("Queue is empty");
-  return queue -> queue_array[queue -> queue_end];
+  return queue->queue_array[queue->queue_end];
 }
 
 // check if queue is empty
 int is_empty(struct PCBreadyqueue *queue)
 {
-  return (queue -> size == 0);
+  return (queue->size == 0);
 }
 
 // check if queue is full
 int is_full(struct PCBreadyqueue *queue)
 {
-  return (queue -> size == queue -> capacity);
+  return (queue->size == queue->capacity);
+}
+
+// remove a specific PCB given its index in the queue array, not necessarily the one at the front of the queue
+int remove_specific_PCB(struct PCBreadyqueue *queue, int index)
+{
+  if (is_empty(queue))
+  {
+    return -1;
+  }
+  queue->queue_start = (index + 1) % (queue->capacity);
+  queue->size = queue->size - 1;
+  return 0;
+}
+
+// for sorting the array of PCBs
+// Code Inspiration: https://stackoverflow.com/questions/8721189/how-to-sort-an-array-of-structs-in-c
+int compare_instruction_length(const void *pcb_1, const void *pcb_2)
+{
+  struct PCB *p1 = (struct PCB *)pcb_1;
+  struct PCB *p2 = (struct PCB *)pcb_2;
+  if (p1->num_instructions < p2->num_instructions)
+    return -1;
+  else if (p1->num_instructions > p2->num_instructions)
+    return +1;
+  else
+    return 0;
 }
 
 // run ready queue with either first come first serve (FCFS), round robin (RR), shortest job first (SJF)
@@ -100,15 +126,67 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
   }
 
   // round robin
+  // each program runs 2 instructions each before being switched
   else if (strcmp(policy, "RR") == 0)
   {
-    return -1;
+    // start at the front of the queue, and add on size modulus size to get the next
+    int curr_pcb_index = queue->queue_start;
+
+    // use boolean array to keep track of which are active (1) or inactive (0), with pid as array index
+    int active_PCBs[queue->size];
+    for (int i = 0; i < queue->size; i++)
+    {
+      active_PCBs[i] = 1;
+    }
+
+    while (!is_empty(queue))
+    {
+      struct PCB curr_pcb = queue->queue_array[curr_pcb_index];
+      if (curr_pcb.current_instruction < curr_pcb.num_instructions)
+      {
+        run_PCB_RR(curr_pcb); // run another 2 instructions if not finished yet
+      }
+      else
+      {
+        remove_specific_PCB(queue, curr_pcb_index);
+        remove_script(curr_pcb);
+      }
+      curr_pcb_index = (curr_pcb_index + 1) % (queue->capacity);
+    }
   }
 
   // shortest job first
+  // program with fewest lines goes first
   else if (strcmp(policy, "SJF") == 0)
   {
-    return -1;
+    // reorder queue basde on number of instructions
+    // using bubblesort for the sake of simplicity, plus we only need to deal with 3 processes at most
+
+    // struct PCB* new_queue_array = (struct PCB *)malloc(queue->size * sizeof(struct PCB));
+
+    queue->queue_start = 0;
+    queue->queue_end = queue->size - 1;
+
+    int i, j;
+    for (i = 0; i < queue->size - 1; i++)
+    {
+      for (j = 0; j < queue->size - i - 1; j++)
+      {
+        if ((queue->queue_array[j]).num_instructions > (queue->queue_array[j + 1]).num_instructions)
+        {
+          struct PCB temp_PCB = queue->queue_array[j];
+          queue->queue_array[j] = queue->queue_array[j + 1];
+          queue->queue_array[j + 1] = temp_PCB;
+        }
+      }
+    }
+    while (!is_empty(queue))
+    {
+      struct PCB curr_pcb = peek_front(queue);
+      run_PCB_FCFS(curr_pcb, queue);
+      dequeue(queue);
+      remove_script(curr_pcb);
+    }
   }
   else
     return -1;
@@ -150,6 +228,37 @@ int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
 
   // printf("shell memory is:\n");
   // show_memory();
+
+  return 0;
+}
+
+// run 2 instructions at a time
+int run_PCB_RR(struct PCB pcb)
+{
+  // printf("memory is:\n");
+  // show_memory();
+  int curr_instr_index = pcb.current_instruction;
+  int instruction_count = 0;
+  while ((curr_instr_index < pcb.num_instructions) && (instruction_count < 2))
+  {
+    // start at the currently running instruction
+    char identifier[100];
+    sprintf(identifier, "%d-%d", pcb.pid, curr_instr_index);
+
+    char *curr_instruction = mem_get_command_value(pcb.script_location_start, curr_instr_index, identifier);
+    // printf("curr instr is %s\n", curr_instruction);
+    int errorCode = parseInput(curr_instruction);
+
+    if (errorCode == -1)
+    {
+      return -1;
+    }
+
+    curr_instr_index++;
+    instruction_count++;
+  }
+
+  pcb.current_instruction = curr_instr_index;
 
   return 0;
 }
