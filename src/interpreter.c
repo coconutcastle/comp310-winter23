@@ -7,6 +7,8 @@
 #include <ctype.h>
 #include "shellmemory.h"
 #include "shell.h"
+#include "processControlBlock.h"
+#include "ready_queue.h"
 
 int MAX_ARGS_SIZE = 7; // assuming you won't get more than 7 arguments
 
@@ -51,6 +53,7 @@ int my_mkdir(char *dirname);
 int my_touch(char *filename);
 int my_cd(char *rel_path);
 int dirname_comp(const void *a, const void *b);
+int exec(char *commands[], int numCommands);
 
 int print(char *var);
 int run(char *script);
@@ -324,6 +327,23 @@ int my_cd(char *rel_path)
 	return 0;
 }
 
+// execute processes
+int exec(char *commands[], int numCommands)
+{
+
+  // load source code for each process into shell memory
+
+  // create source code for each process
+
+  // add PCBs to ready queue
+
+  // remove completed processes/PCBs from ready queue
+
+  // clean up - remove code from shell memory
+
+  return 0;
+}
+
 //code inspiration taken from https://stackoverflow.com/questions/34046133/error-handling-mkdir-and-chdir-in-c
 int print(char *var)
 {
@@ -342,20 +362,34 @@ int run(char *script)
 		return badcommandFileDoesNotExist();
 	}
 
-	fgets(line, 999, p);
-	while (1)
-	{
-		errCode = parseInput(line); // which calls interpreter()
-		memset(line, 0, sizeof(line));
+  // create ready queue
+  struct PCBreadyqueue* pcb_rq = create_ready_queue(3);
 
-		if (feof(p))
-		{
-			break;
-		}
-		fgets(line, 999, p);
-	}
+  // create PCB
+  struct PCB* pcb = create_PCB(1, p);
 
-	fclose(p);
+  // put in ready queue and run
+  enqueue(pcb_rq, *pcb);
+  
+
+  // ============= OG method =============
+
+  // fgets(line, 999, p);
+	// while (1)
+	// {
+	// 	errCode = parseInput(line); // which calls interpreter()
+	// 	memset(line, 0, sizeof(line));
+
+	// 	if (feof(p))
+	// 	{
+	// 		break;
+	// 	}
+	// 	fgets(line, 999, p);
+	// }
+
+  // fclose(p);
+
+  // ========================================
 
 	return errCode;
 }

@@ -4,9 +4,14 @@
 #include <unistd.h>
 #include "interpreter.h"
 #include "shellmemory.h"
+#include "processControlBlock.h"
+#include "ready_queue.h"
 
 int MAX_USER_INPUT = 1000;
 int parseInput(char ui[]);
+
+// ./mysh < ../testcases/assignment1/echo.txt
+// ./mysh < ../testcases/assignment2/echo.txt
 
 // Start of everything
 // code for one-liners inspiration taken from https://www.tutorialspoint.com/c_standard_library/c_function_strtok.htm
