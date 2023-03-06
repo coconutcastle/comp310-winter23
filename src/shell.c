@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     input_token = strtok(userInput, semicolon);
     while (input_token != NULL)
     {
-      // printf("eyy 1\n");
+      // printf("calling shell: %s\n", input_token);
       errorCode = parseInput(input_token);
       if (errorCode == -1)
         exit(99); // ignore all other errors
@@ -77,71 +77,71 @@ int parseInput(char ui[])
   // this is really not working...
 
   // printf("in parse\n");
-  // char tmp[200];
-  // char *words[100];
-  // int a = 0;
-  // int b;
-  // int w = 0; // wordID
-  // int errorCode;
-  // printf("parse 1");
-  // for (a = 0; ui[a] == ' ' && a < 1000; a++)
-  // 	; // skip white spaces
-  // while (ui[a] != '\n' && ui[a] != '\0' && a < 1000)
-  // {
-  // 	for (b = 0; ui[a] != ';' && ui[a] != '\0' && ui[a] != '\n' && ui[a] != ' ' && a < 1000; a++, b++)
-  // 	{
-  //     printf("parse 2");
-  // 		tmp[b] = ui[a];
-  // 		// extract a word
-  // 	}
-  //   printf("parse 3");
-  // 	tmp[b] = '\0';
-  // 	words[w] = strdup(tmp);
-  // 	w++;
-  // 	if (ui[a] == '\0')
-  // 		break;
-  // 	a++;
-  // }
-  // printf("going to interpreter\n");
-  // errorCode = interpreter(words, w);
-  // return errorCode;
-
   char tmp[200];
   char *words[100];
   int a = 0;
   int b;
   int w = 0; // wordID
   int errorCode;
+  // printf("parse 1");
   for (a = 0; ui[a] == ' ' && a < 1000; a++)
-    ; // skip white spaces
-
+  	; // skip white spaces
   while (ui[a] != '\n' && ui[a] != '\0' && a < 1000)
   {
-    while (ui[a] == ' ')
-      a++;
-    if (ui[a] == '\0')
-      break;
-    for (b = 0; ui[a] != ';' && ui[a] != '\0' && ui[a] != '\n' && ui[a] != ' ' && a < 1000; a++, b++)
-      tmp[b] = ui[a];
-    tmp[b] = '\0';
-    if (strlen(tmp) == 0)
-      continue;
-    words[w] = strdup(tmp);
-    if (ui[a] == ';')
-    {
-      w++;
-      errorCode = interpreter(words, w);
-      if (errorCode == -1)
-        return errorCode;
-      a++;
-      w = 0;
-      for (; ui[a] == ' ' && a < 1000; a++)
-        ; // skip white spaces
-      continue;
-    }
-    w++;
-    a++;
+  	for (b = 0; ui[a] != ';' && ui[a] != '\0' && ui[a] != '\n' && ui[a] != ' ' && a < 1000; a++, b++)
+  	{
+      // printf("parse 2");
+  		tmp[b] = ui[a];
+  		// extract a word
+  	}
+    // printf("parse 3");
+  	tmp[b] = '\0';
+  	words[w] = strdup(tmp);
+  	w++;
+  	if (ui[a] == '\0')
+  		break;
+  	a++;
   }
+  // printf("going to interpreter\n");
   errorCode = interpreter(words, w);
   return errorCode;
+
+  // char tmp[200];
+  // char *words[100];
+  // int a = 0;
+  // int b;
+  // int w = 0; // wordID
+  // int errorCode;
+  // for (a = 0; ui[a] == ' ' && a < 1000; a++)
+  //   ; // skip white spaces
+
+  // while (ui[a] != '\n' && ui[a] != '\0' && a < 1000)
+  // {
+  //   while (ui[a] == ' ')
+  //     a++;
+  //   if (ui[a] == '\0')
+  //     break;
+  //   for (b = 0; ui[a] != ';' && ui[a] != '\0' && ui[a] != '\n' && ui[a] != ' ' && a < 1000; a++, b++)
+  //     tmp[b] = ui[a];
+  //   tmp[b] = '\0';
+  //   if (strlen(tmp) == 0)
+  //     continue;
+  //   words[w] = strdup(tmp);
+  //   if (ui[a] == ';')
+  //   {
+  //     w++;
+  //     errorCode = interpreter(words, w);
+  //     if (errorCode == -1)
+  //       return errorCode;
+  //     a++;
+  //     w = 0;
+  //     for (; ui[a] == ' ' && a < 1000; a++)
+  //       ; // skip white spaces
+  //     continue;
+  //   }
+  //   w++;
+  //   a++;
+  // }
+  // errorCode = interpreter(words, w);
+  // return errorCode;
 }

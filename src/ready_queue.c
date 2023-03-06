@@ -131,27 +131,37 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
   {
     // start at the front of the queue, and add on size modulus size to get the next
     int curr_pcb_index = queue->queue_start;
+    int terminated_count = 0;   // keep track of the number of finished processes
 
-    // use boolean array to keep track of which are active (1) or inactive (0), with pid as array index
     int active_PCBs[queue->size];
-    for (int i = 0; i < queue->size; i++)
+    for (int x = 0; x < queue->size; x++)
     {
-      active_PCBs[i] = 1;
+      active_PCBs[x] = 1;   // 1 for ative, 0 for inactive
     }
 
-    while (!is_empty(queue))
+    while (terminated_count < (queue -> size))
     {
-      struct PCB curr_pcb = queue->queue_array[curr_pcb_index];
-      if (curr_pcb.current_instruction < curr_pcb.num_instructions)
+      struct PCB *curr_pcb = &(queue->queue_array[curr_pcb_index]);
+      if (curr_pcb->current_instruction < curr_pcb->num_instructions)
       {
+        // printf("while again, curr is %d\n", curr_pcb.current_instruction);
         run_PCB_RR(curr_pcb); // run another 2 instructions if not finished yet
       }
-      else
+      else if (active_PCBs[curr_pcb->pid] == 1)
       {
-        remove_specific_PCB(queue, curr_pcb_index);
-        remove_script(curr_pcb);
+        // once finished running remove the script but for the sake of simplicity
+        // wait until everything is done to dequeue
+        terminated_count++;
+        remove_script(*curr_pcb);
+        active_PCBs[curr_pcb->pid] = 0;
       }
       curr_pcb_index = (curr_pcb_index + 1) % (queue->capacity);
+    }
+
+    // now dequeue everything
+    for (int i = 0; i < terminated_count; i++)
+    {
+      dequeue(queue);
     }
   }
 
@@ -186,6 +196,9 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
       run_PCB_FCFS(curr_pcb, queue);
       dequeue(queue);
       remove_script(curr_pcb);
+
+      // printf("shell memory is:\n");
+      // show_memory();
     }
   }
   else
@@ -207,6 +220,7 @@ int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
 
     char *curr_instruction = mem_get_command_value(pcb.script_location_start, curr_instr_index, identifier);
     // printf("curr instr is %s\n", curr_instruction);
+    // printf("calling\n");
     int errorCode = parseInput(curr_instruction);
 
     if (errorCode == -1)
@@ -233,19 +247,20 @@ int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
 }
 
 // run 2 instructions at a time
-int run_PCB_RR(struct PCB pcb)
+// ugh just return the new instruction for now. I'll fix it later
+int run_PCB_RR(struct PCB* pcb)
 {
   // printf("memory is:\n");
   // show_memory();
-  int curr_instr_index = pcb.current_instruction;
+  int curr_instr_index = pcb->current_instruction;
   int instruction_count = 0;
-  while ((curr_instr_index < pcb.num_instructions) && (instruction_count < 2))
+  while ((curr_instr_index < pcb->num_instructions) && (instruction_count < 2))
   {
     // start at the currently running instruction
     char identifier[100];
-    sprintf(identifier, "%d-%d", pcb.pid, curr_instr_index);
+    sprintf(identifier, "%d-%d", pcb->pid, curr_instr_index);
 
-    char *curr_instruction = mem_get_command_value(pcb.script_location_start, curr_instr_index, identifier);
+    char *curr_instruction = mem_get_command_value(pcb->script_location_start, curr_instr_index, identifier);
     // printf("curr instr is %s\n", curr_instruction);
     int errorCode = parseInput(curr_instruction);
 
@@ -256,9 +271,12 @@ int run_PCB_RR(struct PCB pcb)
 
     curr_instr_index++;
     instruction_count++;
+
+    // printf("index and instrcount: %d and %d\n", curr_instr_index, instruction_count);
   }
 
-  pcb.current_instruction = curr_instr_index;
+  pcb->current_instruction = curr_instr_index;
+  // printf("new curr instr is %d\n", pcb.current_instruction);
 
   return 0;
 }
