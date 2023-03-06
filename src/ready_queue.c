@@ -110,6 +110,8 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
 
 int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
 {
+  // printf("memory is:\n");
+  // show_memory();
   int curr_instr_index = pcb.current_instruction;
   while (curr_instr_index < pcb.num_instructions)
   {
@@ -118,6 +120,7 @@ int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
     sprintf(identifier, "%d-%d", pcb.pid, curr_instr_index);
 
     char *curr_instruction = mem_get_command_value(pcb.script_location_start, curr_instr_index, identifier);
+    // printf("curr instr is %s\n", curr_instruction);
     int errorCode = parseInput(curr_instruction);
 
     if (errorCode == -1)

@@ -68,8 +68,6 @@ int interpreter(char *command_args[], int args_size)
 {
 	int i;
 
-  printf("access %s\n", command_args[0]);
-
 	if (args_size < 1)
 	{
 		return badcommand();

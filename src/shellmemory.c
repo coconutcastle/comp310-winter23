@@ -99,23 +99,25 @@ char *mem_get_value(char *var_in)
 int mem_find_space(int size)
 {
   int i;
-  int count_upto = size;
+  int consecutive_empty_slots = size;
+  int slot_start = 0;
   // move through memory until you find a block that's the right size
   for (i = 0; i < 1000; i++)
   {
     // empty slot
     if (strcmp(shellmemory[i].var, "none") == 0)
     {
-      count_upto--;
+      consecutive_empty_slots--;
     }
     // if encounter full slot before finding enough space, reset to size and start over
     else
     {
-      count_upto = size;
+      consecutive_empty_slots = size;
+      slot_start = i;
     }
-    if (count_upto == 0)
+    if (consecutive_empty_slots == 0)
     {
-      return i;
+      return slot_start;
     }
   }
   return -1;
@@ -123,8 +125,9 @@ int mem_find_space(int size)
 
 int mem_set_command_value(int start, char *command, char *identifier)
 {
-  shellmemory[start].var = identifier;
-  shellmemory[start].value = command;
+  // printf("setting %s mem to: %s\n", identifier, command);
+  shellmemory[start].var = strdup(identifier);
+  shellmemory[start].value = strdup(command);
   return 0;
 }
 
@@ -139,7 +142,12 @@ char *mem_get_command_value(int start, int curr_instruction, char *identifier)
   {
     return "Nothing for that instruction";
   }
-  else return shellmemory[location].value;
+  
+  else 
+  {
+    // printf("retrieving %s=%s at %d\n", shellmemory[location].var, shellmemory[location].value, location);
+    return shellmemory[location].value;
+  }
 }
 
 int mem_clean_out_block(int start, int num_instructions)
@@ -155,4 +163,13 @@ int mem_clean_out_block(int start, int num_instructions)
     shellmemory[start + i].var = "none";
     shellmemory[start + i].value = "none";
   }
+}
+
+void show_memory(){
+	int i;
+	for (i=0; i<1000; i++){
+		if (strcmp(shellmemory[i].var, "none") != 0){
+			printf("index = %d  %s=%s\n",i ,shellmemory[i].var, shellmemory[i].value);
+		}
+	}
 }
