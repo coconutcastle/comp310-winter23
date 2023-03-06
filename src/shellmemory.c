@@ -141,3 +141,18 @@ char *mem_get_command_value(int start, int curr_instruction, char *identifier)
   }
   else return shellmemory[location].value;
 }
+
+int mem_clean_out_block(int start, int num_instructions)
+{
+  int i;
+  for (i = 0; i < num_instructions; i++)
+  {
+    if (strcmp(shellmemory[start + i].var, "none") == 0)
+    {
+      printf("Missing instructions");
+      return -1;
+    }
+    shellmemory[start + i].var = "none";
+    shellmemory[start + i].value = "none";
+  }
+}

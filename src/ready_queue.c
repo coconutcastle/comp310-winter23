@@ -131,8 +131,14 @@ int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
   if (curr_instr_index == pcb.num_instructions)
   {
     pcb.current_instruction = curr_instr_index;
-    dequeue(queue);
+    struct PCB removed_pcb = dequeue(queue);
   }
 
   return 0;
+}
+
+// remove single script
+int remove_script(struct PCB pcb)
+{
+  mem_clean_out_block(pcb.script_location_start, pcb.num_instructions);
 }

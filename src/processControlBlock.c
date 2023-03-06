@@ -26,7 +26,7 @@ struct PCB *create_PCB(int pid, FILE *commandLines)
   if (fgets(line, sizeof(line), commandLines) != NULL)
   {
     // split commands by newline, add to memory one line at a time
-    char *command = strtok(line, (char *)'\n');
+    char *command = strtok(line, (char *)"\n");
     while (command != NULL)
     {
       // memory key will be <pid>-<#instruction>
@@ -38,7 +38,9 @@ struct PCB *create_PCB(int pid, FILE *commandLines)
 
       num_commands++;
 
-      command = strtok(NULL, (char *)'\n');
+      // printf("added %d", num_commands);
+
+      command = strtok(NULL, (char *)"\n");
     }
 
     memset(line, 0, sizeof(line));
@@ -49,21 +51,6 @@ struct PCB *create_PCB(int pid, FILE *commandLines)
   pcb->script_location_end = pcb_start_loc + 100;
   pcb->num_instructions = num_commands;
   pcb->current_instruction = 0;
-
-  // fgets(line, 999, p);
-  // while (1)
-  // {
-  // 	errCode = parseInput(line); // which calls interpreter()
-  // 	memset(line, 0, sizeof(line));
-
-  // 	if (feof(p))
-  // 	{
-  // 		break;
-  // 	}
-  // 	fgets(line, 999, p);
-  // }
-
-  // fclose(p);
 
   return pcb;
 }

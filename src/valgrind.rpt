@@ -1,0 +1,244 @@
+==303346== Memcheck, a memory error detector
+==303346== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==303346== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==303346== Command: ./mysh
+==303346== Parent PID: 263502
+==303346== 
+==303346== Conditional jump or move depends on uninitialised value(s)
+==303346==    at 0x48EAB56: __vfprintf_internal (vfprintf-internal.c:1516)
+==303346==    by 0x48F5A08: __vsprintf_internal (iovsprintf.c:95)
+==303346==    by 0x48D49A7: sprintf (sprintf.c:30)
+==303346==    by 0x10AB3F: create_PCB (processControlBlock.c:35)
+==303346==    by 0x10A461: run (interpreter.c:378)
+==303346==    by 0x109E25: interpreter (interpreter.c:155)
+==303346==    by 0x1099EE: parseInput (shell.c:156)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346== 
+==303346== Use of uninitialised value of size 8
+==303346==    at 0x48CE33B: _itoa_word (_itoa.c:177)
+==303346==    by 0x48E9B3D: __vfprintf_internal (vfprintf-internal.c:1516)
+==303346==    by 0x48F5A08: __vsprintf_internal (iovsprintf.c:95)
+==303346==    by 0x48D49A7: sprintf (sprintf.c:30)
+==303346==    by 0x10AB3F: create_PCB (processControlBlock.c:35)
+==303346==    by 0x10A461: run (interpreter.c:378)
+==303346==    by 0x109E25: interpreter (interpreter.c:155)
+==303346==    by 0x1099EE: parseInput (shell.c:156)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346== 
+==303346== Conditional jump or move depends on uninitialised value(s)
+==303346==    at 0x48CE34C: _itoa_word (_itoa.c:177)
+==303346==    by 0x48E9B3D: __vfprintf_internal (vfprintf-internal.c:1516)
+==303346==    by 0x48F5A08: __vsprintf_internal (iovsprintf.c:95)
+==303346==    by 0x48D49A7: sprintf (sprintf.c:30)
+==303346==    by 0x10AB3F: create_PCB (processControlBlock.c:35)
+==303346==    by 0x10A461: run (interpreter.c:378)
+==303346==    by 0x109E25: interpreter (interpreter.c:155)
+==303346==    by 0x1099EE: parseInput (shell.c:156)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346== 
+==303346== Conditional jump or move depends on uninitialised value(s)
+==303346==    at 0x48EA643: __vfprintf_internal (vfprintf-internal.c:1516)
+==303346==    by 0x48F5A08: __vsprintf_internal (iovsprintf.c:95)
+==303346==    by 0x48D49A7: sprintf (sprintf.c:30)
+==303346==    by 0x10AB3F: create_PCB (processControlBlock.c:35)
+==303346==    by 0x10A461: run (interpreter.c:378)
+==303346==    by 0x109E25: interpreter (interpreter.c:155)
+==303346==    by 0x1099EE: parseInput (shell.c:156)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346== 
+==303346== Conditional jump or move depends on uninitialised value(s)
+==303346==    at 0x48E9C85: __vfprintf_internal (vfprintf-internal.c:1516)
+==303346==    by 0x48F5A08: __vsprintf_internal (iovsprintf.c:95)
+==303346==    by 0x48D49A7: sprintf (sprintf.c:30)
+==303346==    by 0x10AB3F: create_PCB (processControlBlock.c:35)
+==303346==    by 0x10A461: run (interpreter.c:378)
+==303346==    by 0x109E25: interpreter (interpreter.c:155)
+==303346==    by 0x1099EE: parseInput (shell.c:156)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346== 
+==303346== Conditional jump or move depends on uninitialised value(s)
+==303346==    at 0x484FBDC: strcmp (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==303346==    by 0x10A96C: mem_get_command_value (shellmemory.c:138)
+==303346==    by 0x10B088: run_PCB_FCFS (ready_queue.c:120)
+==303346==    by 0x10AFA7: run_ready_queue (ready_queue.c:90)
+==303346==    by 0x10A4D3: run (interpreter.c:385)
+==303346==    by 0x109E25: interpreter (interpreter.c:155)
+==303346==    by 0x1099EE: parseInput (shell.c:156)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346== 
+==303346== Conditional jump or move depends on uninitialised value(s)
+==303346==    at 0x10A96F: mem_get_command_value (shellmemory.c:138)
+==303346==    by 0x10B088: run_PCB_FCFS (ready_queue.c:120)
+==303346==    by 0x10AFA7: run_ready_queue (ready_queue.c:90)
+==303346==    by 0x10A4D3: run (interpreter.c:385)
+==303346==    by 0x109E25: interpreter (interpreter.c:155)
+==303346==    by 0x1099EE: parseInput (shell.c:156)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x491D443: strtok_r (strtok_r.c:47)
+==303346==    by 0x1096DE: main (shell.c:69)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  1366 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x4853D76: strspn (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==303346==    by 0x491D3FB: strtok_r (strtok_r.c:56)
+==303346==    by 0x1096DE: main (shell.c:69)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  1342 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x491D400: strtok_r (strtok_r.c:57)
+==303346==    by 0x1096DE: main (shell.c:69)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  1366 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x4853C8B: strcspn (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==303346==    by 0x491D411: strtok_r (strtok_r.c:64)
+==303346==    by 0x1096DE: main (shell.c:69)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  1358 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x4853CCC: strcspn (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==303346==    by 0x491D411: strtok_r (strtok_r.c:64)
+==303346==    by 0x1096DE: main (shell.c:69)
+==303346==  Address 0x1ffefffaab is on thread 1's stack
+==303346==  1357 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x491D416: strtok_r (strtok_r.c:65)
+==303346==    by 0x1096DE: main (shell.c:69)
+==303346==  Address 0x1ffefffaac is on thread 1's stack
+==303346==  1364 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x109789: parseInput (shell.c:117)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  358 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x109995: parseInput (shell.c:121)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  358 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x1099AF: parseInput (shell.c:121)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  358 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x1097BF: parseInput (shell.c:124)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  358 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x1097D9: parseInput (shell.c:127)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  358 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x109836: parseInput (shell.c:130)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  358 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x109850: parseInput (shell.c:130)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  358 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x10986A: parseInput (shell.c:130)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  358 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x109884: parseInput (shell.c:130)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  358 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x109803: parseInput (shell.c:131)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  358 bytes below stack pointer
+==303346== 
+==303346== Invalid read of size 1
+==303346==    at 0x1098F3: parseInput (shell.c:139)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346==  Address 0x1ffefffaac is on thread 1's stack
+==303346==  356 bytes below stack pointer
+==303346== 
+==303346== Invalid write of size 1
+==303346==    at 0x4852790: memset (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==303346==    by 0x1096CD: main (shell.c:68)
+==303346==  Address 0x1ffefffaaa is on thread 1's stack
+==303346==  1406 bytes below stack pointer
+==303346== 
+==303346== Invalid write of size 1
+==303346==    at 0x4852868: memset (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==303346==    by 0x1096CD: main (shell.c:68)
+==303346==  Address 0x1ffefffab0 is on thread 1's stack
+==303346==  1400 bytes below stack pointer
+==303346== 
+==303346== 
+==303346== HEAP SUMMARY:
+==303346==     in use at exit: 688 bytes in 18 blocks
+==303346==   total heap usage: 21 allocs, 3 frees, 10,928 bytes allocated
+==303346== 
+==303346== 20 bytes in 1 blocks are definitely lost in loss record 2 of 7
+==303346==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==303346==    by 0x10AAB7: create_PCB (processControlBlock.c:20)
+==303346==    by 0x10A461: run (interpreter.c:378)
+==303346==    by 0x109E25: interpreter (interpreter.c:155)
+==303346==    by 0x1099EE: parseInput (shell.c:156)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346== 
+==303346== 47 bytes in 5 blocks are definitely lost in loss record 3 of 7
+==303346==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==303346==    by 0x491C60E: strdup (strdup.c:42)
+==303346==    by 0x1098CC: parseInput (shell.c:137)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346== 
+==303346== 60 bytes in 8 blocks are definitely lost in loss record 5 of 7
+==303346==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==303346==    by 0x491C60E: strdup (strdup.c:42)
+==303346==    by 0x1098CC: parseInput (shell.c:137)
+==303346==    by 0x10B09E: run_PCB_FCFS (ready_queue.c:121)
+==303346==    by 0x10AFA7: run_ready_queue (ready_queue.c:90)
+==303346==    by 0x10A4D3: run (interpreter.c:385)
+==303346==    by 0x109E25: interpreter (interpreter.c:155)
+==303346==    by 0x1099EE: parseInput (shell.c:156)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346== 
+==303346== 84 (24 direct, 60 indirect) bytes in 1 blocks are definitely lost in loss record 6 of 7
+==303346==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==303346==    by 0x10AC2C: create_ready_queue (ready_queue.c:12)
+==303346==    by 0x10A438: run (interpreter.c:373)
+==303346==    by 0x109E25: interpreter (interpreter.c:155)
+==303346==    by 0x1099EE: parseInput (shell.c:156)
+==303346==    by 0x1096A4: main (shell.c:65)
+==303346== 
+==303346== LEAK SUMMARY:
+==303346==    definitely lost: 151 bytes in 15 blocks
+==303346==    indirectly lost: 60 bytes in 1 blocks
+==303346==      possibly lost: 0 bytes in 0 blocks
+==303346==    still reachable: 477 bytes in 2 blocks
+==303346==         suppressed: 0 bytes in 0 blocks
+==303346== Reachable blocks (those to which a pointer was found) are not shown.
+==303346== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==303346== 
+==303346== Use --track-origins=yes to see where uninitialised values come from
+==303346== For lists of detected and suppressed errors, rerun with: -s
+==303346== ERROR SUMMARY: 47 errors from 30 contexts (suppressed: 0 from 0)

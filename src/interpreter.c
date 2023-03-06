@@ -68,6 +68,8 @@ int interpreter(char *command_args[], int args_size)
 {
 	int i;
 
+  printf("access %s\n", command_args[0]);
+
 	if (args_size < 1)
 	{
 		return badcommand();
@@ -79,9 +81,11 @@ int interpreter(char *command_args[], int args_size)
 
 	for (i = 0; i < args_size; i++)
 	{ // strip spaces new line etc
+    // printf("access %s\n", command_args[i]);
 		command_args[i][strcspn(command_args[i], "\r\n")] = 0;
 	}
 
+  // printf("comp 1\n");
 	if (strcmp(command_args[0], "help") == 0)
 	{
 		// help
@@ -354,7 +358,7 @@ int print(char *var)
 int run(char *script)
 {
 	int errCode = 0;
-	char line[1000];
+	// char line[1000];
 	FILE *p = fopen(script, "rt"); // the program is in a file
 
 	if (p == NULL)
@@ -370,7 +374,7 @@ int run(char *script)
 
   // put in ready queue and run
   enqueue(pcb_rq, *pcb);
-  
+  run_ready_queue(pcb_rq, "FCFS");
 
   // ============= OG method =============
 
