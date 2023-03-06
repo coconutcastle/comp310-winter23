@@ -49,6 +49,12 @@ int badcommand_exec()
   return 7;
 }
 
+int badcommand_exec_filename()
+{
+  printf("%s\n", "Bad command: same file name");
+  return 8;
+}
+
 int help();
 int quit();
 
@@ -69,6 +75,7 @@ int badCommandTooManyTokens();
 int badcommand_my_mkdir();
 int badcommand_my_cd();
 int badcommand_exec();
+int badcommand_exec_filename();
 
 // Interpret commands and their arguments
 int interpreter(char *command_args[], int args_size)
@@ -362,7 +369,7 @@ int exec(char *commands[], int num_commands)
     if (strcmp(commands[1], commands[2]) == 0)
     {
 
-      return badcommand_exec();
+      return badcommand_exec_filename();
     }
   }
   else if (num_processes == 3)
@@ -371,7 +378,7 @@ int exec(char *commands[], int num_commands)
         (strcmp(commands[1], commands[3]) == 0) || 
         (strcmp(commands[2], commands[3]) == 0))
     {
-      return badcommand_exec();
+      return badcommand_exec_filename();
     }
   }
 

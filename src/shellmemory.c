@@ -113,7 +113,7 @@ int mem_find_space(int size)
     else
     {
       consecutive_empty_slots = size;
-      slot_start = i;
+      slot_start = i + 1;   // make it i + 1 because i isn't actually free
     }
     if (consecutive_empty_slots == 0)
     {

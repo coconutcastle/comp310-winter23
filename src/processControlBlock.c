@@ -11,7 +11,7 @@ struct PCB *create_PCB(int pid, FILE *commandLines)
 {
   // find memory block that will fit the commands
   // assuming each script has <= 100 lines of source code
-  int pcb_start_loc = mem_find_space(100);
+  int pcb_start_loc = mem_find_space(100);    // need to make it 101 instead of 100 - memory overrides otherwise
   if (pcb_start_loc == -1)
   {
     printf("No space.");
@@ -34,7 +34,7 @@ struct PCB *create_PCB(int pid, FILE *commandLines)
     command = strtok(line, "\n");
     while (command != NULL)
     {
-      printf("creating command: %s\n", command);
+      // printf("creating command: %s\n", command);
       // memory key will be <pid>-<#instruction>
       // find specific instruction by pcb start + instruction index
       char mem_key[100];
