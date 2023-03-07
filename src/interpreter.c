@@ -170,7 +170,7 @@ int interpreter(char *command_args[], int args_size)
   }
   else if (strcmp(command_args[0], "exec") == 0)
   {
-    if (args_size > 5 || args_size < 3)
+    if (args_size > 6 || args_size < 3)
       return badcommand();
     return exec(command_args, args_size);
   }
@@ -354,13 +354,29 @@ int my_cd(char *rel_path)
 // execute processes
 int exec(char *commands[], int num_commands)
 {
-  int num_processes = num_commands - 2; // number of processes is the total arguments minus the command and policy
-  
+  if (num_commands > 5 && strcmp(commands[num_commands - 1], "#") != 0)
+  {
+    return badcommand_exec();
+  }
+
+  int num_processes;
+  int offset;
+  if (strcmp(commands[num_commands - 1], "#") == 0)
+  {
+    num_processes = num_commands - 3; // number of processes is the total arguments minus the command and policy
+    offset = 2;
+  }
+  else
+  {
+    num_processes = num_commands - 2;
+    offset = 1;
+  }
+
   // check if the last command/the policy is valid
-  if ((strcmp(commands[num_commands - 1], "FCFS") != 0) &&
-      (strcmp(commands[num_commands - 1], "SJF") != 0) &&
-      (strcmp(commands[num_commands - 1], "RR") != 0) &&
-      (strcmp(commands[num_commands - 1], "AGING")) != 0)
+  if ((strcmp(commands[num_commands - offset], "FCFS") != 0) &&
+      (strcmp(commands[num_commands - offset], "SJF") != 0) &&
+      (strcmp(commands[num_commands - offset], "RR") != 0) &&
+      (strcmp(commands[num_commands - offset], "AGING")) != 0)
   {
     return badcommand_exec();
   }
@@ -376,8 +392,8 @@ int exec(char *commands[], int num_commands)
   }
   else if (num_processes == 3)
   {
-    if ((strcmp(commands[1], commands[2]) == 0) || 
-        (strcmp(commands[1], commands[3]) == 0) || 
+    if ((strcmp(commands[1], commands[2]) == 0) ||
+        (strcmp(commands[1], commands[3]) == 0) ||
         (strcmp(commands[2], commands[3]) == 0))
     {
       return badcommand_exec_filename();
@@ -386,8 +402,16 @@ int exec(char *commands[], int num_commands)
 
   // create ready queue
   struct PCBreadyqueue *pcb_rq = create_ready_queue(num_processes);
-  
+
   char rel_path_to_folder[] = "../testcases/assignment2/";
+
+  // background process
+  if (strcmp(commands[num_commands - 1], "#") == 0)
+  {
+    struct PCB *pcb = create_PCB(num_processes + 1, stdin);
+    enqueue(pcb_rq, *pcb);
+  }
+
 
   int i;
   for (i = 0; i < num_processes; i++)
@@ -414,7 +438,7 @@ int exec(char *commands[], int num_commands)
   }
 
   // run all processes once finished queueing up
-  run_ready_queue(pcb_rq, commands[num_commands - 1]);
+  run_ready_queue(pcb_rq, commands[num_commands - offset]);
 
   return 0;
 }

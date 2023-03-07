@@ -125,12 +125,12 @@ int mem_find_space(int size)
 
 int mem_set_command_value(int start, char *command, char *identifier)
 {
-  // printf("setting %s mem to: %s\n", identifier, command);
   shellmemory[start].var = strdup(identifier);
   shellmemory[start].value = strdup(command);
   return 0;
 }
 
+// specifically to locate a command, use location in memory
 char *mem_get_command_value(int start, int curr_instruction, char *identifier)
 {
   int location = start + curr_instruction;
@@ -145,11 +145,11 @@ char *mem_get_command_value(int start, int curr_instruction, char *identifier)
   
   else 
   {
-    // printf("retrieving %s=%s at %d\n", shellmemory[location].var, shellmemory[location].value, location);
     return shellmemory[location].value;
   }
 }
 
+// reset a chunk of memory
 int mem_clean_out_block(int start, int num_instructions)
 {
   int i;
@@ -163,13 +163,4 @@ int mem_clean_out_block(int start, int num_instructions)
     shellmemory[start + i].var = "none";
     shellmemory[start + i].value = "none";
   }
-}
-
-void show_memory(){
-	int i;
-	for (i=0; i<1000; i++){
-		if (strcmp(shellmemory[i].var, "none") != 0){
-			printf("index = %d  %s=%s\n",i ,shellmemory[i].var, shellmemory[i].value);
-		}
-	}
 }

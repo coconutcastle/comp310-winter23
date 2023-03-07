@@ -26,15 +26,12 @@ struct PCB *create_PCB(int pid, FILE *commandLines)
   char *command;
   pcb->pid = pid;
 
-  // printf("full line is %s\n: ", line);
-
   while (fgets(line, sizeof(line), commandLines) != NULL)
   {
     // split commands by newline, add to memory one line at a time
     command = strtok(line, "\n");
     while (command != NULL)
     {
-      // printf("creating command: %s\n", command);
       // memory key will be <pid>-<#instruction>
       // find specific instruction by pcb start + instruction index
       char mem_key[100];
@@ -44,13 +41,8 @@ struct PCB *create_PCB(int pid, FILE *commandLines)
 
       num_commands++;
 
-      // printf("added %d", num_commands);
-
       command = strtok(NULL, "\n");
     }
-    // printf("memory is\n");
-    // show_memory();
-
     memset(line, 0, sizeof(line));
   }
 

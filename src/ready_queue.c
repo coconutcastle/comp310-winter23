@@ -7,6 +7,8 @@
 #include "shellmemory.h"
 #include "shell.h"
 
+// code for this section heavily taken from GeeksForGeeks: https://www.geeksforgeeks.org/introduction-and-array-implementation-of-queue/
+
 struct PCBreadyqueue *create_ready_queue(int capacity)
 {
   struct PCBreadyqueue *queue = (struct PCBreadyqueue *)malloc(sizeof(struct PCBreadyqueue));
@@ -117,11 +119,6 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
       run_PCB_FCFS(curr_pcb, queue);
       dequeue(queue);
       remove_script(curr_pcb);
-
-      // printf("dequeued %d\n", curr_pcb.pid);
-
-      // printf("shell memory is:\n");
-      // show_memory();
     }
   }
 
@@ -144,7 +141,6 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
       struct PCB *curr_pcb = &(queue->queue_array[curr_pcb_index]);
       if (curr_pcb->current_instruction < curr_pcb->num_instructions)
       {
-        // printf("while again, curr is %d\n", curr_pcb.current_instruction);
         run_PCB_RR(curr_pcb); // run another 2 instructions if not finished yet
       }
       else if (active_PCBs[curr_pcb->pid] == 1)
@@ -172,8 +168,6 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
     // reorder queue basde on number of instructions
     // using bubblesort for the sake of simplicity, plus we only need to deal with 3 processes at most
 
-    // struct PCB* new_queue_array = (struct PCB *)malloc(queue->size * sizeof(struct PCB));
-
     queue->queue_start = 0;
     queue->queue_end = queue->size - 1;
 
@@ -196,9 +190,6 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
       run_PCB_FCFS(curr_pcb, queue);
       dequeue(queue);
       remove_script(curr_pcb);
-
-      // printf("shell memory is:\n");
-      // show_memory();
     }
   }
 
@@ -216,6 +207,7 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
 
     // start off with SJF and sort array
     bubble_sort(queue);
+    // bubble_sort(queue);
 
     int front_pointer = queue->queue_start;
 
@@ -224,13 +216,12 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
     {
       if (active_PCBs[(queue->queue_array[front_pointer]).pid] == 0)
       {
-        front_pointer = (front_pointer + 1) % (queue -> capacity);
+        front_pointer = (front_pointer + 1) % (queue->capacity);
       }
 
       struct PCB *curr_pcb = &(queue->queue_array[front_pointer]); // front of queue
       if (curr_pcb->current_instruction < curr_pcb->num_instructions)
       {
-        // printf("while again, curr is %d\n", curr_pcb->current_instruction);
         run_PCB_AGING(curr_pcb); // execute 1 instruction in current process
 
         // age all jobs in ready queue aside from head by decreasing job length score
@@ -254,18 +245,14 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
         // printf("terminated %d\n", terminated_count);
         remove_script(*curr_pcb);
         active_PCBs[curr_pcb->pid] = 0;
-        // dequeue(queue);
-
-        // queue -> queue_start -> (queue)
       }
     }
 
     // now dequeue everything
-    // for (int i = 0; i < terminated_count; i++)
-    // {
-    //   dequeue(queue);
-    // }
-
+    for (int i = 0; i < terminated_count; i++)
+    {
+      dequeue(queue);
+    }
   }
   else
     return -1;
@@ -275,29 +262,28 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
 
 int bubble_sort(struct PCBreadyqueue *queue)
 {
-  queue->queue_start = 0;
-  queue->queue_end = queue->size - 1;
-
   int i, j;
-  for (i = 0; i < queue->size - 1; i++)
+  for (i = queue -> queue_start; i < queue -> queue_start + queue->capacity - 1; i++)
   {
-    for (j = 0; j < queue->size - i - 1; j++)
+    for (j = queue -> queue_start; j < queue -> queue_start + queue->capacity - i - 1; j++)
     {
-      if ((queue->queue_array[j]).job_length_score > (queue->queue_array[j + 1]).job_length_score)
+      int index = j % (queue -> capacity);
+      if ((queue->queue_array[index]).job_length_score > (queue->queue_array[index + 1]).job_length_score)
       {
-        struct PCB temp_PCB = queue->queue_array[j];
-        queue->queue_array[j] = queue->queue_array[j + 1];
-        queue->queue_array[j + 1] = temp_PCB;
+        struct PCB temp_PCB = queue->queue_array[index];
+        queue->queue_array[index] = queue->queue_array[index + 1];
+        queue->queue_array[index + 1] = temp_PCB;
       }
     }
   }
+  queue->queue_start = 0;
+  queue->queue_end = queue->capacity - 1;
+
   return 0;
 }
 
 int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
 {
-  // printf("memory is:\n");
-  // show_memory();
   int curr_instr_index = pcb.current_instruction;
   while (curr_instr_index < pcb.num_instructions)
   {
@@ -306,8 +292,6 @@ int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
     sprintf(identifier, "%d-%d", pcb.pid, curr_instr_index);
 
     char *curr_instruction = mem_get_command_value(pcb.script_location_start, curr_instr_index, identifier);
-    // printf("curr instr is %s\n", curr_instruction);
-    // printf("calling\n");
     int errorCode = parseInput(curr_instruction);
 
     if (errorCode == -1)
@@ -320,16 +304,6 @@ int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
 
   pcb.current_instruction = curr_instr_index;
 
-  // if (curr_instr_index == pcb.num_instructions)
-  // {
-  //   pcb.current_instruction = curr_instr_index;
-  //   struct PCB removed_pcb = dequeue(queue);
-  //   remove_script(removed_pcb);
-  // }
-
-  // printf("shell memory is:\n");
-  // show_memory();
-
   return 0;
 }
 
@@ -337,7 +311,6 @@ int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
 // ugh just return the new instruction for now. I'll fix it later
 int run_PCB_RR(struct PCB *pcb)
 {
-  // printf("memory is:\n");
   // show_memory();
   int curr_instr_index = pcb->current_instruction;
   int instruction_count = 0;
@@ -348,7 +321,6 @@ int run_PCB_RR(struct PCB *pcb)
     sprintf(identifier, "%d-%d", pcb->pid, curr_instr_index);
 
     char *curr_instruction = mem_get_command_value(pcb->script_location_start, curr_instr_index, identifier);
-    // printf("curr instr is %s\n", curr_instruction);
     int errorCode = parseInput(curr_instruction);
 
     if (errorCode == -1)
@@ -358,12 +330,9 @@ int run_PCB_RR(struct PCB *pcb)
 
     curr_instr_index++;
     instruction_count++;
-
-    // printf("index and instrcount: %d and %d\n", curr_instr_index, instruction_count);
   }
 
   pcb->current_instruction = curr_instr_index;
-  // printf("new curr instr is %d\n", pcb.current_instruction);
 
   return 0;
 }
@@ -387,7 +356,6 @@ int run_PCB_AGING(struct PCB *pcb)
     }
 
     pcb->current_instruction = pcb->current_instruction + 1;
-    // printf("instrcount ad pid: %d and %d\n", pcb->current_instruction, pcb->pid);
   }
   return 0;
 }
