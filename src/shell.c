@@ -38,36 +38,47 @@ int main(int argc, char *argv[])
 
   mem_init(); // init shell memory
 
-  while (1)
-  {
-    // check if commands are from file (batch) or terminal (interactive)
-    if (isatty(fileno(stdin)))
-    {
-      printf("%c ", prompt);
-    }
+  while(1) {						
+        if (isatty(fileno(stdin))) printf("%c ",prompt);
+		fgets(userInput, MAX_USER_INPUT-1, stdin);
+		if (feof(stdin)){
+			freopen("/dev/tty", "r", stdin);
+		}	
+		errorCode = parseInput(userInput);
+		if (errorCode == -1) exit(99);	// ignore all other errors
+		memset(userInput, 0, sizeof(userInput));
+	}
 
-    // file stream input ends
-    // currently does not reopen terminal after file ends, but it does prevent an infinite loop
-    if (feof(stdin))
-    {
-      break;
-    }
+  // while (1)
+  // {
+  //   // check if commands are from file (batch) or terminal (interactive)
+  //   if (isatty(fileno(stdin)))
+  //   {
+  //     printf("%c ", prompt);
+  //   }
 
-    // when stdin is written to userinput, userinput is filled with the entered command line
-    fgets(userInput, MAX_USER_INPUT - 1, stdin);
+  //   // file stream input ends
+  //   // currently does not reopen terminal after file ends, but it does prevent an infinite loop
+  //   if (feof(stdin))
+  //   {
+  //     break;
+  //   }
 
-    // split user input by semicolons and execute each as a separate command
-    input_token = strtok(userInput, semicolon);
-    while (input_token != NULL)
-    {
-      // printf("calling shell: %s\n", input_token);
-      errorCode = parseInput(input_token);
-      if (errorCode == -1)
-        exit(99); // ignore all other errors
-      memset(input_token, 0, sizeof(input_token));
-      input_token = strtok(NULL, semicolon);
-    }
-  }
+  //   // when stdin is written to userinput, userinput is filled with the entered command line
+  //   fgets(userInput, MAX_USER_INPUT - 1, stdin);
+
+  //   // split user input by semicolons and execute each as a separate command
+  //   input_token = strtok(userInput, semicolon);
+  //   while (input_token != NULL)
+  //   {
+  //     printf("calling shell: %s\n", userInput);
+  //     errorCode = parseInput(input_token);
+  //     if (errorCode == -1)
+  //       exit(99); // ignore all other errors
+  //     memset(input_token, 0, sizeof(input_token));
+  //     input_token = strtok(NULL, semicolon);
+  //   }
+  // }
 
   return 0;
 }

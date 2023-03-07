@@ -24,7 +24,7 @@ struct PCB *create_PCB(int pid, FILE *commandLines)
   int num_commands = 0;
 
   char *command;
-  pcb->pid = 1;
+  pcb->pid = pid;
 
   // printf("full line is %s\n: ", line);
 
