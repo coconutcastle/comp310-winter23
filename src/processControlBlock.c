@@ -57,6 +57,7 @@ struct PCB *create_PCB(int pid, FILE *commandLines)
   pcb->script_location_start = pcb_start_loc;
   pcb->script_location_end = pcb_start_loc + 100;
   pcb->num_instructions = num_commands;
+  pcb->job_length_score = num_commands;   // default is same as number of instructions
   pcb->current_instruction = 0;
 
   return pcb;

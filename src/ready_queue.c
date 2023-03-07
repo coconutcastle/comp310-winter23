@@ -131,15 +131,15 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
   {
     // start at the front of the queue, and add on size modulus size to get the next
     int curr_pcb_index = queue->queue_start;
-    int terminated_count = 0;   // keep track of the number of finished processes
+    int terminated_count = 0; // keep track of the number of finished processes
 
     int active_PCBs[queue->size];
     for (int x = 0; x < queue->size; x++)
     {
-      active_PCBs[x] = 1;   // 1 for ative, 0 for inactive
+      active_PCBs[x] = 1; // 1 for ative, 0 for inactive
     }
 
-    while (terminated_count < (queue -> size))
+    while (terminated_count < (queue->size))
     {
       struct PCB *curr_pcb = &(queue->queue_array[curr_pcb_index]);
       if (curr_pcb->current_instruction < curr_pcb->num_instructions)
@@ -201,9 +201,85 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
       // show_memory();
     }
   }
+  // SJF with aging
+  // this is going to be pretty inefficient
+  else if (strcmp(policy, "AGING") == 0)
+  {
+    int terminated_count = 0; // keep track of the number of finished processes
+
+    int active_PCBs[queue->size];
+    for (int x = 0; x < queue->size; x++)
+    {
+      active_PCBs[x] = 1; // 1 for ative, 0 for inactive
+    }
+
+    // start off with SJF and sort array
+    bubble_sort(queue);
+
+    int curr_pcb_index = queue->queue_start;
+
+    // reassess queueu every 1 instruction
+    while (terminated_count < (queue->size))
+    {
+      struct PCB *curr_pcb = &(queue->queue_array[queue->queue_start]); // front of queue
+      if (curr_pcb->current_instruction < curr_pcb->num_instructions)
+      {
+        run_PCB_AGING(curr_pcb); // execute 1 instruction in current process
+
+        // age all jobs in ready queue aside from head by decreasing job length score
+        for (int i = 0; i < queue->capacity; i++)
+        {
+          struct PCB *to_age_pcb = &(queue->queue_array[i]);
+          if ((i != queue->queue_start) && (to_age_pcb->job_length_score > 0))
+          {
+            to_age_pcb->job_length_score = to_age_pcb->job_length_score - 1;
+          }
+        }
+
+        // resort queue so shortest job length in front
+        bubble_sort(queue);
+      }
+      else if (active_PCBs[curr_pcb->pid] == 1)
+      {
+        // once finished running remove the script but for the sake of simplicity
+        // wait until everything is done to dequeue
+        terminated_count++;
+        remove_script(*curr_pcb);
+        active_PCBs[curr_pcb->pid] = 0;
+      }
+    }
+
+    // now dequeue everything
+    for (int i = 0; i < terminated_count; i++)
+    {
+      dequeue(queue);
+    }
+    
+  }
   else
     return -1;
 
+  return 0;
+}
+
+int bubble_sort(struct PCBreadyqueue *queue)
+{
+  queue->queue_start = 0;
+  queue->queue_end = queue->size - 1;
+
+  int i, j;
+  for (i = 0; i < queue->size - 1; i++)
+  {
+    for (j = 0; j < queue->size - i - 1; j++)
+    {
+      if ((queue->queue_array[j]).job_length_score > (queue->queue_array[j + 1]).job_length_score)
+      {
+        struct PCB temp_PCB = queue->queue_array[j];
+        queue->queue_array[j] = queue->queue_array[j + 1];
+        queue->queue_array[j + 1] = temp_PCB;
+      }
+    }
+  }
   return 0;
 }
 
@@ -248,7 +324,7 @@ int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue)
 
 // run 2 instructions at a time
 // ugh just return the new instruction for now. I'll fix it later
-int run_PCB_RR(struct PCB* pcb)
+int run_PCB_RR(struct PCB *pcb)
 {
   // printf("memory is:\n");
   // show_memory();
@@ -278,6 +354,29 @@ int run_PCB_RR(struct PCB* pcb)
   pcb->current_instruction = curr_instr_index;
   // printf("new curr instr is %d\n", pcb.current_instruction);
 
+  return 0;
+}
+
+// run just one instruction at a time
+int run_PCB_AGING(struct PCB *pcb)
+{
+  if (pcb->current_instruction < pcb->num_instructions)
+  {
+    // start at the currently running instruction
+    char identifier[100];
+    sprintf(identifier, "%d-%d", pcb->pid, pcb->current_instruction);
+
+    char *curr_instruction = mem_get_command_value(pcb->script_location_start, pcb->current_instruction, identifier);
+    // printf("curr instr is %s\n", curr_instruction);
+    int errorCode = parseInput(curr_instruction);
+
+    if (errorCode == -1)
+    {
+      return -1;
+    }
+
+    pcb->current_instruction = pcb->current_instruction + 1;
+  }
   return 0;
 }
 

@@ -19,6 +19,8 @@ struct PCB peek_end(struct PCBreadyqueue *queue);
 int is_empty(struct PCBreadyqueue* queue);
 int is_full(struct PCBreadyqueue* queue);
 int run_ready_queue(struct PCBreadyqueue* queue, char *policy);
+int bubble_sort(struct PCBreadyqueue *queue);
+int run_PCB_AGING(struct PCB *pcb);
 int run_PCB_FCFS(struct PCB pcb, struct PCBreadyqueue *queue);
 int run_PCB_RR(struct PCB* pcb);
 int remove_script(struct PCB pcb);

@@ -7,6 +7,7 @@ struct PCB
   int script_location_start;
   int script_location_end;
   int num_instructions;
+  int job_length_score;     // only used by AGING policy
   int current_instruction;
 };
 
