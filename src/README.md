@@ -11,6 +11,9 @@ Note that due to using a separate project repository than the one originally sub
 Some other things:
 - There are some memory leakage issues due to uses of `strdup()` in the starter code.
 - The current implementation closes the shell if a file does not end in "quit" in batch mode. It does not go to interactive mode, but it does prevent an infinite loop.
+- For Assignment 2, I unfortunately was not able to finish multithreading, and there are a few minor issues in some of the AGING test cases that I did not have enough time to go into depth into.
+- I used GeeksForGeek's array implementation of a queue for this assignment, which made the AGING implementation far more difficult.
+- It appears that many of the test cases are very inconsistent with their headings for the second assignment. Some are missing headers entirely. This was still the case when I pulled from upstream recently, but I'm unsure if the grading infrastructure will use the tests in the original repository or the problematic ones here.
 
 ## To Run
 
