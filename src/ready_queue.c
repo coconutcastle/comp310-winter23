@@ -201,6 +201,7 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
       // show_memory();
     }
   }
+
   // SJF with aging
   // this is going to be pretty inefficient
   else if (strcmp(policy, "AGING") == 0)
@@ -216,14 +217,20 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
     // start off with SJF and sort array
     bubble_sort(queue);
 
-    int curr_pcb_index = queue->queue_start;
+    int front_pointer = queue->queue_start;
 
     // reassess queueu every 1 instruction
     while (terminated_count < (queue->size))
     {
-      struct PCB *curr_pcb = &(queue->queue_array[queue->queue_start]); // front of queue
+      if (active_PCBs[(queue->queue_array[front_pointer]).pid] == 0)
+      {
+        front_pointer = (front_pointer + 1) % (queue -> capacity);
+      }
+
+      struct PCB *curr_pcb = &(queue->queue_array[front_pointer]); // front of queue
       if (curr_pcb->current_instruction < curr_pcb->num_instructions)
       {
+        // printf("while again, curr is %d\n", curr_pcb->current_instruction);
         run_PCB_AGING(curr_pcb); // execute 1 instruction in current process
 
         // age all jobs in ready queue aside from head by decreasing job length score
@@ -244,17 +251,21 @@ int run_ready_queue(struct PCBreadyqueue *queue, char *policy)
         // once finished running remove the script but for the sake of simplicity
         // wait until everything is done to dequeue
         terminated_count++;
+        // printf("terminated %d\n", terminated_count);
         remove_script(*curr_pcb);
         active_PCBs[curr_pcb->pid] = 0;
+        // dequeue(queue);
+
+        // queue -> queue_start -> (queue)
       }
     }
 
     // now dequeue everything
-    for (int i = 0; i < terminated_count; i++)
-    {
-      dequeue(queue);
-    }
-    
+    // for (int i = 0; i < terminated_count; i++)
+    // {
+    //   dequeue(queue);
+    // }
+
   }
   else
     return -1;
@@ -376,6 +387,7 @@ int run_PCB_AGING(struct PCB *pcb)
     }
 
     pcb->current_instruction = pcb->current_instruction + 1;
+    // printf("instrcount ad pid: %d and %d\n", pcb->current_instruction, pcb->pid);
   }
   return 0;
 }
