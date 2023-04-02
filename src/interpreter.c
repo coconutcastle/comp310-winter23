@@ -208,6 +208,7 @@ int quit(){
 	printf("%s\n", "Bye!");
 	threads_terminate();
 	ready_queue_destory();
+  remove_backing_store("backing_store");
 	exit(0);
 }
 
