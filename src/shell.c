@@ -24,6 +24,7 @@ int parseInput(char ui[]);
 // ./mysh < ../testcases/assignment3/T_tc1.txt
 // make clean;make mysh fsize=500 vsize=500
 // make clean;make mysh fsize=500 vsize=500;./mysh < ../testcases/assignment3/T_tc1.txt
+// make clean;make mysh fsize=500 vsize=500;./mysh < ../testcases/assignment3/T_tc7.txt
 // valgrind --leak-check=yes make mysh fsize=500 vsize=500
 int main(int argc, char *argv[])
 {

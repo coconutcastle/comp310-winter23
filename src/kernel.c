@@ -177,6 +177,8 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
   int blanks_counter = 0;
   char line[101];
 
+  // print_ready_queue();
+
   // go through all lines in file
   while (fgets(line, sizeof(line), fp) != NULL)
   {
@@ -202,6 +204,8 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
         lines[i] = "\0";
       }
     }
+
+    // print_ready_queue();
 
     // now put full pages in memory
 
@@ -235,6 +239,8 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
         newPCB->page_table[i].frame = page_index / 3;
         newPCB->page_table[i].valid = 1;
 
+        // print_ready_queue();
+
         // printf("pc is %d\n", newPCB->program_counter);
 
         // printf("done setting %d at %d w %d\n", newPCB->page_table[i].frame, i, page_index);
@@ -258,6 +264,8 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
     }
     newPCB->num_blank_lines = blanks_counter;
   }
+
+  // print_ready_queue();
 
   ready_queue_add_to_tail(node);
 
@@ -410,11 +418,11 @@ bool execute_process(struct QueueNode *node, int quanta)
     else {
       // printShellMemory();
       // print_ready_queue();
+      // printf("for prog w %d lines and %d spaces, pc=%d\n", pcb->num_lines, pcb->num_blank_lines, pcb->program_counter);
       terminate_process(node);
       return true;    // ugh this was the only thing that would make the program quit properly
     }
   }
-
   return false;
 }
 

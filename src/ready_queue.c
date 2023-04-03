@@ -167,7 +167,7 @@ void print_ready_queue(){
     struct QueueNode *cur = head;
     printf("%s\n","Ready queue: ");
     while(cur!=NULL){
-        printf("\tPID: %d, length: %d, priority: %d, pc: %d\n", cur->pcb->pid, cur->pcb->job_length_score, cur->pcb->priority, cur->pcb->program_counter);
+        printf("\tPID: %d, length: %d, priority: %d, pc: %d\n", cur->pcb->pid, cur->pcb->num_lines, cur->pcb->priority, cur->pcb->program_counter);
         cur = cur->next;
     }
 }
