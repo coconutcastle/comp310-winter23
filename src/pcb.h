@@ -6,6 +6,7 @@ struct PTE
 {
   int frame;
   int valid;
+  int last_used;    // the longer its been since its been accessed, the larger the number gets
 };
 
 /*
@@ -28,6 +29,8 @@ struct PCB
   // int start;
   // int end;
   int job_length_score;
+  char *filename;
+  char *progname;
 
   // page table
   struct PTE page_table[10];
@@ -39,5 +42,5 @@ struct PCB
 // }
 
 int generatePID();
-struct PCB *makePCB(int numlines);
+struct PCB *makePCB(int numlines, char *filename, char *progname);
 #endif
