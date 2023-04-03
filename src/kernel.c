@@ -242,8 +242,16 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
       else
       {
         // no free space to put page, page fault
-
+        
         // find least recently used page
+        // init_LRU();
+        // sort_LRU();
+
+        // struct LRU_Node *victim = get_LRU();
+
+        // printf("%s\n", "Page fault! Victim page contents:");
+
+        // printf("%s\n", "End of victim page contents.");
 
         // struct LRU_PCB *frame_to_evict =
       }
@@ -364,17 +372,16 @@ bool execute_process(struct QueueNode *node, int quanta)
 
       // printf("valid %d\n", pte->frame);
 
-      frame = 0;
+      // frame = 0;
 
-      while (i < quanta && frame < 3)
-      {
+      
         int mem_loc = ((curr_pte->frame) * 3) + ((pcb->program_counter) % 3);
-        // printf("mem loc %d %d\n", mem_loc, pte->frame);
+        // printf("mem loc %d %d %d\n", mem_loc, curr_pte->frame, pcb->program_counter);
         // line = mem_get_value_at_line(pcb->PC++);
 
         line = mem_get_value_at_line(mem_loc);
         // printf("Got line %s\n", line);
-        if (strlen(line) > 0)
+        if (strlen(line) > 0 && strcmp(line, "none") != 0)
         {
           in_background = true;
           if (pcb->priority)
@@ -382,7 +389,7 @@ bool execute_process(struct QueueNode *node, int quanta)
             pcb->priority = false;
           }
 
-          if ((pcb->program_counter) >= (pcb->num_lines))
+          if ((pcb->program_counter) >= (pcb->num_lines + pcb ->num_blank_lines))
           {
             parseInput(line);
             terminate_process(node);
@@ -396,11 +403,14 @@ bool execute_process(struct QueueNode *node, int quanta)
           in_background = false;
         }
         pcb->program_counter = pcb->program_counter + 1;
-        frame++;
+        // frame++;
         i++;
-      }
+      
     }
     else {
+      // printShellMemory();
+      // print_ready_queue();
+      terminate_process(node);
       return true;    // ugh this was the only thing that would make the program quit properly
     }
   }
@@ -527,7 +537,7 @@ void *scheduler_RR(void *arg)
   // print_ready_queue();
   int quanta = ((int *)arg)[0];
   struct QueueNode *cur;
-  printf("%s\n", "entering");
+  // printf("%s\n", "entering");
   while (true)
   {
     // print_ready_queue();

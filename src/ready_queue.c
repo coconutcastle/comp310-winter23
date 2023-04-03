@@ -48,7 +48,8 @@ int init_LRU() {
 }
 
 // put the most recently used at the front, so the LRU is at the back
-int sort_LRU() {
+// return head
+void sort_LRU() {
   struct LRU_Node *curr = LRU_head;
   struct LRU_Node *tempNode = NULL;
   struct LRU_Node *insert = NULL;
@@ -115,6 +116,10 @@ int sort_LRU() {
   }
 }
 
+struct LRU_Node *get_LRU() {
+  return LRU_tail;
+}
+
 void ready_queue_destory()
 {
     if(!head) return;
@@ -179,7 +184,7 @@ void terminate_process(struct QueueNode *node){
       }
     }
 
-    printf("%s\n", "terminated");
+    // printf("%s\n", "terminated");
 
     // printShellMemory();
 
