@@ -2,11 +2,22 @@
 #define READY_QUEUE_H
 #include <pthread.h>
 #include "pcb.h"
+
 #define MAX_INT 2147483646
 
-struct QueueNode{
+struct QueueNode {
     struct PCB *pcb;
     struct QueueNode *next;
+};
+
+struct LRU_Node {
+  int last_used;
+  int page_table_index;
+  int page_num;
+  char *prog_name;
+  int pid;
+  struct LRU_Node* previous_node;
+  struct LRU_Node* next_node;
 };
 
 void ready_queue_destory();

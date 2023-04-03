@@ -6,8 +6,6 @@ struct PTE
 {
   int frame;
   int valid;
-  int age;
-  char *script_id;
 };
 
 /*
@@ -25,6 +23,7 @@ struct PCB
   int pid;
   int program_counter;
   int num_lines;
+  int num_blank_lines;
   int mem_start;
   // int start;
   // int end;
