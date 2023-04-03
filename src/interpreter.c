@@ -359,7 +359,51 @@ int run(char *script)
   // errCode 11: bad command file does not exist
   int errCode = 0;
   // load script into shell
-  errCode = process_initialize(script, script);
+
+  char prog_path[100];
+  strcpy(prog_path, "../testcases/assignment3/");
+  strcat(prog_path, script);
+
+  // open program file
+  FILE *program = fopen(prog_path, "rt");
+
+  if (program == NULL)
+  {
+    return handleError(11);
+  }
+
+  char prog_filename[100];
+
+  strcpy(prog_filename, "./backing_store/");
+  strcat(prog_filename, script);
+  strcat(prog_filename, ".txt");
+
+  FILE *file = fopen(prog_filename, "w");
+
+  int line_count = 0;
+  char prog_line[1000];
+
+  while (fgets(prog_line, sizeof(prog_line), program) != NULL)
+  {
+    // printf("%s\n", prog_line);
+    if (strchr(prog_line, ';') != NULL)
+    {
+      char *token = strtok(prog_line, ";");
+
+      fprintf(file, "%s\n", token);
+      token = strtok(NULL, ";");
+      token = token + 1;
+      fprintf(file, "%s", token);
+
+      line_count += 2;
+      continue;
+    }
+
+    fprintf(file, "%s", prog_line);
+    line_count++;
+  }
+
+  errCode = process_initialize(prog_filename, script, line_count);
   if (errCode == 11)
   {
     return handleError(errCode);
@@ -484,15 +528,9 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
       // printf("%s\n", "initializing process");
 
       // initialize PCB with copied program
-      error_code = process_initialize(prog_filename, fnames[i]);
+      error_code = process_initialize(prog_filename, fnames[i], line_count);
 
       // printf("%s\n", "done init process");
-
-      // only 2 pages loaded into frame store
-
-      // for (int i = 0; i < 2; i++) {
-      //   for (int j = 0; j < )
-      // }
 
       if (error_code != 0)
       {
@@ -501,7 +539,13 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
     }
   }
 
-  printf("%s\n", "begin scheduling");
+  // printf("%s\n", "begin scheduling");
+  // print_ready_queue();
+  // printShellMemory();
+
+  // char *comm = mem_get_command("P_program3-0-0");
+  // printf("%s\n", comm);
+
   error_code = schedule_by_policy(policy, mt);
   if (error_code == 15)
   {

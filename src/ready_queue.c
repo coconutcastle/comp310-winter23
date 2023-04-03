@@ -60,14 +60,27 @@ void print_ready_queue(){
     struct QueueNode *cur = head;
     printf("%s\n","Ready queue: ");
     while(cur!=NULL){
-        printf("\tPID: %d, length: %d, priority: %d\n", cur->pcb->pid, cur->pcb->job_length_score, cur->pcb->priority);
+        printf("\tPID: %d, length: %d, priority: %d, pc: %d\n", cur->pcb->pid, cur->pcb->job_length_score, cur->pcb->priority, cur->pcb->program_counter);
         cur = cur->next;
     }
 }
 
 void terminate_process(struct QueueNode *node){
     //node should not be in the ready queue
-    mem_free_lines_between(node->pcb->start, node->pcb->end);
+
+    // get all pages associated with process, always in chunks of 3
+    struct PTE *pte = node -> pcb -> page_table;
+
+    for (int i = 0; i < 10; i++) {
+      if (pte[i].valid == 1) {
+        mem_free_lines_between(pte[i].frame * 3, (pte[i].frame * 3) + 2);
+      }
+    }
+
+    // printf("%s\n", "terminated");
+
+    // mem_free_lines_between(node->pcb->start, node->pcb->end);
+
     free(node);
 }
 
@@ -78,6 +91,7 @@ bool is_ready_empty(){
 struct QueueNode *ready_queue_pop_head(){
     struct QueueNode *tmp = head;
     if(head!=NULL) head = head->next;
+    // printf("popped %d at %d\n", tmp->pcb->pid, tmp->pcb->program_counter);
     return tmp;
 }
 

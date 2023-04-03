@@ -23,8 +23,9 @@ struct PCB
 {
   bool priority;
   int pid;
-  int PC;
+  int program_counter;
   int num_lines;
+  int mem_start;
   // int start;
   // int end;
   int job_length_score;

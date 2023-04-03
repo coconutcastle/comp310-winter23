@@ -103,6 +103,22 @@ char *mem_get_value(char *var_in)
   return NULL;
 }
 
+// get value based on input key
+char *mem_get_command(char *var_in)
+{
+  // only search variable store
+  for (int i = 0; i < var_store_start; i++)
+  {
+    // printf("%s %s\n", shellmemory[i].var, shellmemory[i].value);
+    if (strcmp(shellmemory[i].var, var_in) == 0)
+    {
+      // printf("%s\n", "found");
+      return strdup(shellmemory[i].value);
+    }
+  }
+  return NULL;
+}
+
 void printShellMemory()
 {
   int count_empty = 0;
@@ -306,7 +322,7 @@ int load_file(FILE *fp, int *pStart, int *pEnd, char *filename)
 int get_free_page_frame()
 {
   int i;
-  int free_index = -1;
+  int free_index = 0;
   int free_count = 0; // needs to reach 3 to count as a free spot
 
   for (i = 0; i < var_store_start; i++)
@@ -318,20 +334,21 @@ int get_free_page_frame()
     else
     {
       free_count = 0;   // reset if not enough room for 3 lines
+      free_index = i + 1;
     }
     if (free_count == 3)
     {
-      free_index = i;
-      break;
+      return free_index;
     }
   }
-  return free_index;
+  return -1;
 }
 
-int mem_set_by_index(int index, char *var, char *value) {
-  if (strcmp(shellmemory[index].value, "none") == 0) {
-    shellmemory[index].var = var;
-    shellmemory[index].value = value;
+int mem_set_by_index(int index, char *var_key, char *val) {
+  if (strcmp(shellmemory[index].var, "none") == 0) {
+    shellmemory[index].var = strdup(var_key);
+    shellmemory[index].value = strdup(val);
+
   } else {
     return -1;
   }
@@ -339,7 +356,7 @@ int mem_set_by_index(int index, char *var, char *value) {
 
 char *mem_get_value_at_line(int index)
 {
-  printf("getting line at %d\n", index);
+  // printf("getting line at %d\n", index);
   if (index < 0 || index > SHELL_MEM_LENGTH)
     return NULL;
   return shellmemory[index].value;
@@ -361,3 +378,20 @@ void mem_free_lines_between(int start, int end)
     shellmemory[i].value = "none";
   }
 }
+
+
+// reset a chunk of memory
+// int mem_clean_out_block(int start, int num_instructions)
+// {
+//   int i;
+//   for (i = 0; i < num_instructions; i++)
+//   {
+//     if (strcmp(shellmemory[start + i].var, "none") == 0)
+//     {
+//       printf("Missing instructions");
+//       return -1;
+//     }
+//     shellmemory[start + i].var = "none";
+//     shellmemory[start + i].value = "none";
+//   }
+// }
