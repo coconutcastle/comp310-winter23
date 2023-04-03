@@ -10,9 +10,21 @@
 #include "kernel.h"
 #include "shell.h"
 
+#if defined(X) && defined(Y)
+    int frameSize = X;
+    int varMemSize = Y;
+#else
+    int frameSize = 500;
+    int varMemSize = 500;
+#endif
+
 int MAX_USER_INPUT = 1000;
 int parseInput(char ui[]);
 
+// ./mysh < ../testcases/assignment3/T_tc1.txt
+// make clean;make mysh fsize=500 vsize=500
+// make clean;make mysh fsize=500 vsize=500;./mysh < ../testcases/assignment3/T_tc1.txt
+// valgrind --leak-check=yes make mysh fsize=500 vsize=500
 int main(int argc, char *argv[])
 {
   printf("%s\n", "Shell version 1.2 Created January 2023\n");
@@ -30,6 +42,7 @@ int main(int argc, char *argv[])
   printf("Frame Store Size = %d; Variable Store Size = %d\n", frameSize, varMemSize);
 
   // create backing store
+  // printf("%s\n","done mem init");
   create_backing_store();
 
   while (1)
@@ -99,6 +112,7 @@ int parseInput(char *ui)
 
 int create_backing_store()
 {
+  // printf("%s\n", "in create b store");
   char *dir = "backing_store";
 
   if (opendir(dir) != NULL)

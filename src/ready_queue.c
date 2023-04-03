@@ -11,13 +11,13 @@
 #include "interpreter.h"
 #include "ready_queue.h"
 
-QueueNode *head = NULL;
+struct QueueNode *head = NULL;
 
 void ready_queue_destory()
 {
     if(!head) return;
-    QueueNode *cur = head;
-    QueueNode *tmp;
+    struct QueueNode *cur = head;
+    struct QueueNode *tmp;
     while(cur->next!=NULL){
         tmp = cur->next;
         free(cur);
@@ -26,21 +26,21 @@ void ready_queue_destory()
     free(cur);
 }
 
-void ready_queue_add_to_tail(QueueNode *node)
+void ready_queue_add_to_tail(struct QueueNode *node)
 {
     if(!head){
         head = node;
         head->next = NULL;
     }
     else{
-        QueueNode *cur = head;
+        struct QueueNode *cur = head;
         while(cur->next!=NULL) cur = cur->next;
         cur->next = node;
         cur->next->next = NULL;
     }
 }
 
-void ready_queue_add_to_head(QueueNode *node)
+void ready_queue_add_to_head(struct QueueNode *node)
 {
     if(!head){
         head = node;
@@ -54,18 +54,18 @@ void ready_queue_add_to_head(QueueNode *node)
 
 void print_ready_queue(){
     if(!head) {
-        printf("ready queue is empty\n");
+        printf("%s\n", "ready queue is empty");
         return;
     }
-    QueueNode *cur = head;
-    printf("Ready queue: \n");
+    struct QueueNode *cur = head;
+    printf("%s\n","Ready queue: ");
     while(cur!=NULL){
         printf("\tPID: %d, length: %d, priority: %d\n", cur->pcb->pid, cur->pcb->job_length_score, cur->pcb->priority);
         cur = cur->next;
     }
 }
 
-void terminate_process(QueueNode *node){
+void terminate_process(struct QueueNode *node){
     //node should not be in the ready queue
     mem_free_lines_between(node->pcb->start, node->pcb->end);
     free(node);
@@ -75,14 +75,14 @@ bool is_ready_empty(){
     return head==NULL;
 }
 
-QueueNode *ready_queue_pop_head(){
-    QueueNode *tmp = head;
+struct QueueNode *ready_queue_pop_head(){
+    struct QueueNode *tmp = head;
     if(head!=NULL) head = head->next;
     return tmp;
 }
 
 void ready_queue_decrement_job_length_score(){
-    QueueNode *cur;
+    struct QueueNode *cur;
     cur = head;
     while(cur!=NULL){
         if(cur->pcb->job_length_score>0) cur->pcb->job_length_score--;
@@ -90,10 +90,10 @@ void ready_queue_decrement_job_length_score(){
     }
 }
 
-void ready_queue_swap_with_next(QueueNode *toSwap){
-    QueueNode *next;
-    QueueNode *afterNext;
-    QueueNode *cur = head;
+void ready_queue_swap_with_next(struct QueueNode *toSwap){
+    struct QueueNode *next;
+    struct QueueNode *afterNext;
+    struct QueueNode *cur = head;
     if(head==toSwap){
         next = head->next;
         head->next = next->next;
@@ -110,8 +110,8 @@ void ready_queue_swap_with_next(QueueNode *toSwap){
     toSwap->next = afterNext;
 }
 
-bool swap_needed(QueueNode *cur){
-    QueueNode *next = cur->next;
+bool swap_needed(struct QueueNode *cur){
+    struct QueueNode *next = cur->next;
     if(!next) return false;
     if(cur->pcb->priority && next->pcb->priority){
         if(cur->pcb->job_length_score > next->pcb->job_length_score){
@@ -130,7 +130,7 @@ bool swap_needed(QueueNode *cur){
 void sort_ready_queue(){
     if(head==NULL) return;
     //bubble sort
-    QueueNode *cur = head;
+    struct QueueNode *cur = head;
     bool sorted = false;
     while(!sorted){
         sorted = true;
@@ -146,14 +146,14 @@ void sort_ready_queue(){
     }
 }
 
-QueueNode *ready_queue_pop_shortest_job(){
+struct QueueNode *ready_queue_pop_shortest_job(){
     sort_ready_queue();
-    QueueNode *node = ready_queue_pop_head();
+    struct QueueNode *node = ready_queue_pop_head();
     return node;
 }
 
 int ready_queue_get_shortest_job_score(){
-    QueueNode *cur  = head;
+    struct QueueNode *cur  = head;
     int shortest = MAX_INT;
     while(cur!=NULL){
         if(cur->pcb->job_length_score<shortest) {
@@ -166,8 +166,8 @@ int ready_queue_get_shortest_job_score(){
 
 void ready_queue_promote(int score){
     if(head->pcb->job_length_score == score) return;
-    QueueNode *cur = head;
-    QueueNode *next;
+    struct QueueNode *cur = head;
+    struct QueueNode *next;
     while(cur->next!=NULL){
         if(cur->next->pcb->job_length_score == score) break;
         cur = cur->next;

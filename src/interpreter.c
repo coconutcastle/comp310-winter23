@@ -359,7 +359,7 @@ int run(char *script)
   // errCode 11: bad command file does not exist
   int errCode = 0;
   // load script into shell
-  errCode = process_initialize(script);
+  errCode = process_initialize(script, script);
   if (errCode == 11)
   {
     return handleError(errCode);
@@ -388,6 +388,7 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
   int error_code = 0;
 
   // int valid_programs[] = {0, 0, 0};
+  // printf("%s\n","in exec");
   char *fnames[] = {fname1, fname2, fname3};
 
   if (background)
@@ -427,20 +428,31 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
 
     if (fnames[i] != NULL)
     {
+      char prog_path[100];
+      strcpy(prog_path, "../testcases/assignment3/");
+      strcat(prog_path, fnames[i]);
+
       // open program file
-      FILE *program = fopen(fnames[i], "rt");
+      FILE *program = fopen(prog_path, "rt");
+
+      if (program == NULL)
+      {
+        return handleError(11);
+      }
 
       char prog_filename[100];
 
-      strcpy(prog_filename, "backing_store/");
+      strcpy(prog_filename, "./backing_store/");
       strcat(prog_filename, fnames[i]);
       strcat(prog_filename, ".txt");
 
       FILE *file = fopen(prog_filename, "w");
 
+      // printf("%s\n", "opened file");
+
       if (file == NULL)
       {
-        printf("Program file does not exist");
+        printf("%s\n", "Program file does not exist");
       }
 
       int line_count = 0;
@@ -448,6 +460,7 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
 
       while (fgets(prog_line, sizeof(prog_line), program) != NULL)
       {
+        // printf("%s\n", prog_line);
         if (strchr(prog_line, ';') != NULL)
         {
           char *token = strtok(prog_line, ";");
@@ -465,8 +478,15 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
         line_count++;
       }
 
+      fclose(file);
+      fclose(program);
+
+      // printf("%s\n", "initializing process");
+
       // initialize PCB with copied program
-      error_code = process_initialize(prog_filename);
+      error_code = process_initialize(prog_filename, fnames[i]);
+
+      // printf("%s\n", "done init process");
 
       // only 2 pages loaded into frame store
 
@@ -481,6 +501,7 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
     }
   }
 
+  printf("%s\n", "begin scheduling");
   error_code = schedule_by_policy(policy, mt);
   if (error_code == 15)
   {

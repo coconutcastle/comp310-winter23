@@ -31,12 +31,14 @@ void unlock_queue()
     pthread_mutex_unlock(&queue_lock);
 }
 
-int process_initialize(char *filename)
+int process_initialize(char *filename, char *prog_name)
 {
   FILE *fp;
   int error_code = 0;
-  int *start = (int *)malloc(sizeof(int));
-  int *end = (int *)malloc(sizeof(int));
+  // int *start = (int *)malloc(sizeof(int));
+  // int *end = (int *)malloc(sizeof(int));
+
+  printf("%s\n","in p initialize");
 
   fp = fopen(filename, "rt");
   if (fp == NULL)
@@ -52,24 +54,28 @@ int process_initialize(char *filename)
   //   return error_code;
   // }
 
-  PCB *newPCB = makePCB(*start, *end);
-  QueueNode *node = malloc(sizeof(QueueNode));
+  struct PCB *newPCB = makePCB();
+  struct QueueNode *node = malloc(sizeof(struct QueueNode));
   node->pcb = newPCB;
+
   lock_queue();
 
   // store 2 pages into frame store
-  for (int i = 0; i < 2; i++) {
+  for (int page_num = 0; page_num < 2; page_num++)
+  {
     char *lines[3];
 
     int line_counter = 0;
     char line[101];
-    int page_line_counter = 0;    // number of lines stored
+    int page_line_counter = 0; // number of lines stored
 
     // go through all lines in file
-    while(fgets(line, sizeof(line), fp) != NULL) {
+    while (fgets(line, sizeof(line), fp) != NULL)
+    {
 
       // if number of lines so far within bounds, add to page
-      if ((line_counter >= i * 3) && (line_counter < (i + 1) * 3)) {
+      if ((line_counter >= page_num * 3) && (line_counter < (page_num + 1) * 3))
+      {
         lines[line_counter % 3] = strdup(line);
         page_line_counter++;
       }
@@ -77,18 +83,52 @@ int process_initialize(char *filename)
       memset(line, 0, sizeof(line));
     }
 
-    if (page_line_counter == 0) {
+    if (page_line_counter == 0)
+    {
       break;
     }
 
     // if number of lines stored hasn't reached 3, pad with empty lines
-    if (page_line_counter < 3) {
-      for (int i = page_line_counter; i < 3; i++) {
+    if (page_line_counter < 3)
+    {
+      for (int i = page_line_counter; i < 3; i++)
+      {
         lines[i] = "\0";
       }
     }
 
     // now put full page in memory
+
+    // get first free spot
+    int page_index = get_free_page_frame();
+
+    if (page_index != -1)
+    {
+      char page_name[3];
+      snprintf(page_name, 20, "-%d-", page_num);
+
+      for (int i = 0; i < 3; i++)
+      {
+        char line_name[3];
+        char page_line_name[20];
+
+        snprintf(page_name, 20, "-%d-", i);
+
+        strcpy(page_line_name, prog_name);
+        strcat(page_line_name, page_name);
+        strcat(page_line_name, line_name);
+
+        mem_set_by_index(page_index + i, page_line_name, lines[i]);
+      }
+
+      newPCB->page_table[page_num].frame = page_index / 3;
+      newPCB->page_table[page_num].valid = 1;
+      newPCB->page_table[page_num].age = 0;
+    }
+    else
+    {
+      // no free space to put page, page fault
+    }
   }
 
   ready_queue_add_to_tail(node);
@@ -112,9 +152,9 @@ int shell_process_initialize()
     return error_code;
   }
 
-  PCB *newPCB = makePCB(*start, *end);
+  struct PCB *newPCB = makePCB(*start, *end);
   newPCB->priority = true;
-  QueueNode *node = malloc(sizeof(QueueNode));
+  struct QueueNode *node = malloc(sizeof(struct QueueNode));
   node->pcb = newPCB;
   lock_queue();
 
@@ -125,34 +165,53 @@ int shell_process_initialize()
   return 0;
 }
 
-bool execute_process(QueueNode *node, int quanta)
+bool execute_process(struct QueueNode *node, int quanta)
 {
+  printf("%s\n", "executing policy");
   char *line = NULL;
-  PCB *pcb = node->pcb;
-  for (int i = 0; i < quanta; i++)
+  struct PCB *pcb = node->pcb;
+
+  int page_num = pcb -> PC / 3;
+  struct PTE *pte = &(pcb->page_table[page_num]);
+  printf("got pte, and is %d\n", page_num);
+
+  if (pte->valid == 1)
   {
-    line = mem_get_value_at_line(pcb->PC++);
-    in_background = true;
-    if (pcb->priority)
+    int mem_loc = (pte->frame) * 3;
+
+    printf("mem loc is %d\n", mem_loc);
+
+    for (int i = 0; i < quanta; i++)
     {
-      pcb->priority = false;
-    }
-    if (pcb->PC > pcb->end)
-    {
+      // line = mem_get_value_at_line(pcb->PC++);
+      pcb -> PC += 1;
+      line = mem_get_value_at_line(mem_loc);
+
+      printf("Got line %s\n", line);
+
+      in_background = true;
+      if (pcb->priority)
+      {
+        pcb->priority = false;
+      }
+      if (pcb->PC > pcb->end)
+      {
+        parseInput(line);
+        terminate_process(node);
+        in_background = false;
+        return true;
+      }
       parseInput(line);
-      terminate_process(node);
       in_background = false;
-      return true;
     }
-    parseInput(line);
-    in_background = false;
   }
+
   return false;
 }
 
 void *scheduler_FCFS()
 {
-  QueueNode *cur;
+  struct QueueNode *cur;
   while (true)
   {
     lock_queue();
@@ -175,7 +234,7 @@ void *scheduler_FCFS()
 
 void *scheduler_SJF()
 {
-  QueueNode *cur;
+  struct QueueNode *cur;
   while (true)
   {
     lock_queue();
@@ -198,7 +257,7 @@ void *scheduler_SJF()
 
 void *scheduler_AGING_alternative()
 {
-  QueueNode *cur;
+  struct QueueNode *cur;
   while (true)
   {
     lock_queue();
@@ -227,7 +286,7 @@ void *scheduler_AGING_alternative()
 
 void *scheduler_AGING()
 {
-  QueueNode *cur;
+  struct QueueNode *cur;
   int shortest;
   sort_ready_queue();
   while (true)
@@ -265,8 +324,9 @@ void *scheduler_AGING()
 
 void *scheduler_RR(void *arg)
 {
+  printf("%s\n", "in RR");
   int quanta = ((int *)arg)[0];
-  QueueNode *cur;
+  struct QueueNode *cur;
   while (true)
   {
     lock_queue();
@@ -343,6 +403,7 @@ void threads_terminate()
 
 int schedule_by_policy(char *policy, bool mt)
 {
+  printf("%s\n", "in scheduler");
   if (strcmp(policy, "FCFS") != 0 && strcmp(policy, "SJF") != 0 &&
       strcmp(policy, "RR") != 0 && strcmp(policy, "AGING") != 0 && strcmp(policy, "RR30") != 0)
   {

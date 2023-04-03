@@ -45,15 +45,13 @@ char *extract(char *model)
 
 void mem_init(int frameSize, int varMemSize)
 {
-  int i;
-
   // for this assignment, each frame has 3 lines
   // for now, divide memory evenly between frame and variable store
   // shellmemory is still size 1000
   // assumes variable store starts directly after frame store
-  var_store_start = 500;
+  var_store_start = frameSize;
 
-  for (i = 0; i < 1000; i++)
+  for (int i = 0; i < 1000; i++)
   {
     shellmemory[i].var = "none";
     shellmemory[i].value = "none";
@@ -125,7 +123,7 @@ void printShellMemory()
 void show_var_section()
 {
 
-  printf("------------------------	\n");
+  printf("%s\n","------------------------");
   printf(" var_sectionStart = %d \n", var_store_start);
   int i;
   for (i = var_store_start; i < SHELL_MEM_LENGTH; i++)
@@ -136,7 +134,7 @@ void show_var_section()
     }
   }
 
-  printf("------------------------	\n");
+  printf("%s\n","------------------------	");
 }
 
 /*
@@ -304,13 +302,44 @@ int load_file(FILE *fp, int *pStart, int *pEnd, char *filename)
   return error_code;
 }
 
-// returns if there's enough space for the frmes
-int enough_frame_space() {
-  
+// returns first free slot for a page
+int get_free_page_frame()
+{
+  int i;
+  int free_index = -1;
+  int free_count = 0; // needs to reach 3 to count as a free spot
+
+  for (i = 0; i < var_store_start; i++)
+  {
+    if (strcmp(shellmemory[i].var, "none") == 0)
+    {
+      free_count++;
+    }
+    else
+    {
+      free_count = 0;   // reset if not enough room for 3 lines
+    }
+    if (free_count == 3)
+    {
+      free_index = i;
+      break;
+    }
+  }
+  return free_index;
+}
+
+int mem_set_by_index(int index, char *var, char *value) {
+  if (strcmp(shellmemory[index].value, "none") == 0) {
+    shellmemory[index].var = var;
+    shellmemory[index].value = value;
+  } else {
+    return -1;
+  }
 }
 
 char *mem_get_value_at_line(int index)
 {
+  printf("getting line at %d\n", index);
   if (index < 0 || index > SHELL_MEM_LENGTH)
     return NULL;
   return shellmemory[index].value;

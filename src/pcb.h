@@ -8,12 +8,7 @@ struct PTE
   int valid;
   int age;
   char *script_id;
-}
-
-struct Page
-{
-  char *lines[3];
-}
+};
 
 /*
  * Struct:  PCB
@@ -24,21 +19,25 @@ struct Page
  * end: the last line in shell memory that belongs to this task
  * job_length_score: for EXEC AGING use only, stores the job length score
  */
-typedef struct
+struct PCB
 {
   bool priority;
   int pid;
   int PC;
-  int start;
-  int end;
+  int num_lines;
+  // int start;
+  // int end;
   int job_length_score;
 
   // page table
   struct PTE page_table[10];
-} 
+};
 
-PCB;
+// struct Page
+// {
+//   char *lines[3];
+// }
 
 int generatePID();
-PCB *makePCB(int start, int end);
+struct PCB *makePCB(int numlines);
 #endif

@@ -11,14 +11,16 @@ int generatePID(){
 }
 
 //In this implementation, Pid is the same as file ID 
-PCB* makePCB(int start, int end){
-    PCB * newPCB = malloc(sizeof(PCB));
+struct PCB* makePCB(int num_lines){
+    struct PCB * newPCB = malloc(sizeof(struct PCB));
     newPCB->pid = generatePID();
-    newPCB->PC = start;
-    newPCB->start  = start;
-    newPCB->end = end;
-    newPCB->job_length_score = 1+end-start;
+    newPCB->PC = 0;
+    // newPCB->start  = start;
+    // newPCB->end = end;
+    newPCB->job_length_score = num_lines;
     newPCB->priority = false;
+
+    printf("made pcb with start stop %d %d\n", newPCB->PC, num_lines);
 
     // create frame table, all invalid for now
     for (int i = 0; i < 10; i++) {
