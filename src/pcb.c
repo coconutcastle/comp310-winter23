@@ -19,5 +19,12 @@ PCB* makePCB(int start, int end){
     newPCB->end = end;
     newPCB->job_length_score = 1+end-start;
     newPCB->priority = false;
+
+    // create frame table, all invalid for now
+    for (int i = 0; i < 10; i++) {
+      newPCB -> page_table[i].valid = -1;
+      newPCB -> page_table[i].frame = -1;
+    }
+
     return newPCB;
 }

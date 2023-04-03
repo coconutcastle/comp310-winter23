@@ -26,7 +26,8 @@ int main(int argc, char *argv[])
     userInput[i] = '\0';
 
   // init shell memory
-  mem_init();
+  mem_init(frameSize, varMemSize);
+  printf("Frame Store Size = %d; Variable Store Size = %d\n", frameSize, varMemSize);
 
   // create backing store
   create_backing_store();
