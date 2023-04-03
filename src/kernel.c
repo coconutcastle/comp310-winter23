@@ -542,8 +542,8 @@ bool execute_process(struct QueueNode *node, int quanta)
         // return true;    // ugh this was the only thing that would make the program quit properly
       }
     }
-    return false;
   }
+  return false;
 }
 
 void *scheduler_FCFS()
