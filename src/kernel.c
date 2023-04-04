@@ -52,7 +52,7 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
   lock_queue();
   // store 2 pages into frame store
 
-  char *lines[6];
+  char *lines[6];       // you only load 6 lines initially
   int line_counter = 0;
   int blanks_counter = 0;
   char line[101];

@@ -271,7 +271,7 @@ int quit()
   printf("%s\n", "Bye!");
   threads_terminate();
   ready_queue_destory();
-  remove_backing_store("./backing_store");
+  // remove_backing_store("./backing_store");
   exit(0);
 }
 
@@ -438,34 +438,6 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
   if (background)
     error_code = shell_process_initialize();
 
-  // if (fname1 != NULL)
-  // {
-  //   error_code = process_initialize(fname1);
-  //   valid_programs[0] = 1;
-  //   if (error_code != 0)
-  //   {
-  //     return handleError(error_code);
-  //   }
-  // }
-  // if (fname2 != NULL)
-  // {
-  //   error_code = process_initialize(fname2);
-  //   valid_programs[1] = 1;
-  //   if (error_code != 0)
-  //   {
-  //     return handleError(error_code);
-  //   }
-  // }
-  // if (fname3 != NULL)
-  // {
-  //   error_code = process_initialize(fname3);
-  //   valid_programs[2] = 1;
-  //   if (error_code != 0)
-  //   {
-  //     return handleError(error_code);
-  //   }
-  // }
-
   // copy all program files into backing store and load code with them
   for (int i = 0; i < 3; i++)
   {
@@ -485,10 +457,11 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
       }
 
       char prog_filename[100];
+      snprintf(prog_filename, sizeof(prog_filename), "%s%s%s", "./backing_store/", fnames[i], ".txt");
 
-      strcpy(prog_filename, "./backing_store/");
-      strcat(prog_filename, fnames[i]);
-      strcat(prog_filename, ".txt");
+      // strcpy(prog_filename, "./backing_store/");
+      // strcat(prog_filename, fnames[i]);
+      // strcat(prog_filename, ".txt");
 
       FILE *file = fopen(prog_filename, "w");
 
@@ -504,20 +477,25 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
 
       while (fgets(prog_line, sizeof(prog_line), program) != NULL)
       {
-        // printf("%s\n", prog_line);
-        if (strchr(prog_line, ';') != NULL)
+        // check if a line is split up by semicolons - if so, add them on separate lines
+        char *semi_c_index = strchr(prog_line, ';');
+        if (semi_c_index != NULL)
         {
           char *token = strtok(prog_line, ";");
+          int token_count = 0;
 
-          fprintf(file, "%s\n", token);
-          token = strtok(NULL, ";");
-          token = token + 1;
-          fprintf(file, "%s", token);
-
-          line_count += 2;
-          continue;
+          while (token != NULL)
+          {
+            if (token_count > 0) {
+              fprintf(file, "%s", token);
+            }
+            else {
+              fprintf(file, "%s\n", token);
+            }
+            token = strtok(NULL, ";");
+            line_count++;
+          }
         }
-
         fprintf(file, "%s", prog_line);
         line_count++;
       }
