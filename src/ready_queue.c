@@ -13,6 +13,13 @@
 
 struct QueueNode *head = NULL;
 
+// struct LRU_Node *LRU_head;
+// struct LRU_Node *LRU_tail;
+
+// int init_LRU() {
+  
+// }
+
 void ready_queue_destory()
 {
     if(!head) return;
@@ -71,7 +78,7 @@ void terminate_process(struct QueueNode *node){
     // get all pages associated with process, always in chunks of 3
     struct PTE *pte = node -> pcb -> page_table;
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < node->pcb->page_table_size; i++) {
       if (pte[i].valid == 1) {
         mem_free_lines_between(pte[i].frame * 3, (pte[i].frame * 3) + 2);
       }

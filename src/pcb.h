@@ -31,6 +31,7 @@ struct PCB
   int job_length_score;
   char *filename;
   char *progname;
+  int page_table_size;
 
   // page table
   struct PTE page_table[10];
@@ -42,5 +43,5 @@ struct PCB
 // }
 
 int generatePID();
-struct PCB *makePCB(int numlines, char *filename, char *progname);
+struct PCB *makePCB(int numlines, char *filename, char *progname, int page_table_size);
 #endif

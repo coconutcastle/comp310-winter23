@@ -271,7 +271,7 @@ int quit()
   printf("%s\n", "Bye!");
   threads_terminate();
   ready_queue_destory();
-  // remove_backing_store("./backing_store");
+  remove_backing_store("./backing_store");
   exit(0);
 }
 
@@ -373,10 +373,7 @@ int run(char *script)
   }
 
   char prog_filename[100];
-
-  strcpy(prog_filename, "./backing_store/");
-  strcat(prog_filename, script);
-  strcat(prog_filename, ".txt");
+  snprintf(prog_filename, sizeof(prog_filename), "%s%s%s", "./backing_store/", script, ".txt");
 
   FILE *file = fopen(prog_filename, "w");
 
@@ -386,16 +383,26 @@ int run(char *script)
   while (fgets(prog_line, sizeof(prog_line), program) != NULL)
   {
     // printf("%s\n", prog_line);
-    if (strchr(prog_line, ';') != NULL)
+    char *semi_c_index = strchr(prog_line, ';');
+    if (semi_c_index != NULL)
     {
       char *token = strtok(prog_line, ";");
+      int token_count = 0;
 
-      fprintf(file, "%s\n", token);
-      token = strtok(NULL, ";");
-      token = token + 1;
-      fprintf(file, "%s", token);
-
-      line_count += 2;
+      while (token != NULL)
+      {
+        if (token_count > 0)
+        {
+          fprintf(file, "%s", token);
+        }
+        else
+        {
+          fprintf(file, "%s\n", token);
+        }
+        token = strtok(NULL, ";");
+        line_count++;
+        token_count++;
+      }
       continue;
     }
 
@@ -409,7 +416,7 @@ int run(char *script)
     return handleError(errCode);
   }
   // run with FCFS
-  schedule_by_policy("FCFS", false);
+  schedule_by_policy("RR", false);
   return errCode;
 }
 
@@ -459,13 +466,7 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
       char prog_filename[100];
       snprintf(prog_filename, sizeof(prog_filename), "%s%s%s", "./backing_store/", fnames[i], ".txt");
 
-      // strcpy(prog_filename, "./backing_store/");
-      // strcat(prog_filename, fnames[i]);
-      // strcat(prog_filename, ".txt");
-
       FILE *file = fopen(prog_filename, "w");
-
-      // printf("%s\n", "opened file");
 
       if (file == NULL)
       {
@@ -486,16 +487,21 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
 
           while (token != NULL)
           {
-            if (token_count > 0) {
+            if (token_count > 0)
+            {
               fprintf(file, "%s", token);
             }
-            else {
+            else
+            {
               fprintf(file, "%s\n", token);
             }
             token = strtok(NULL, ";");
             line_count++;
+            token_count++;
           }
+          continue;
         }
+
         fprintf(file, "%s", prog_line);
         line_count++;
       }
@@ -520,9 +526,6 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
   // printf("%s\n", "begin scheduling");
   // print_ready_queue();
   // printShellMemory();
-
-  // char *comm = mem_get_command("P_program3-0-0");
-  // printf("%s\n", comm);
 
   error_code = schedule_by_policy(policy, mt);
   if (error_code == 15)

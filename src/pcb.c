@@ -12,7 +12,7 @@ int generatePID()
 }
 
 // In this implementation, Pid is the same as file ID
-struct PCB *makePCB(int num_lines, char *filename, char *progname)
+struct PCB *makePCB(int num_lines, char *filename, char *progname, int page_table_size)
 {
   struct PCB *newPCB = malloc(sizeof(struct PCB));
   newPCB->pid = generatePID();
@@ -23,11 +23,12 @@ struct PCB *makePCB(int num_lines, char *filename, char *progname)
   // newPCB->end = end;
   newPCB->num_lines = num_lines;
   newPCB->priority = false;
+  newPCB->page_table_size = 10;
 
   // printf("made pcb with numlines %d\n", num_lines);
 
   // create frame table, all invalid for now
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < newPCB->page_table_size; i++)
   {
     newPCB->page_table[i].valid = -1;
     newPCB->page_table[i].frame = -1;

@@ -45,14 +45,14 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
     return error_code;
   }
 
-  struct PCB *newPCB = makePCB(num_lines, filename, prog_name);
+  struct PCB *newPCB = makePCB(num_lines, filename, prog_name, 0);
   struct QueueNode *node = malloc(sizeof(struct QueueNode));
   node->pcb = newPCB;
 
   lock_queue();
   // store 2 pages into frame store
 
-  char *lines[6];       // you only load 6 lines initially
+  char *lines[6]; // you only load 6 lines initially
   int line_counter = 0;
   int blanks_counter = 0;
   char line[101];
@@ -153,7 +153,7 @@ int shell_process_initialize()
     return error_code;
   }
 
-  struct PCB *newPCB = makePCB(end - start, "./", "");
+  struct PCB *newPCB = makePCB(end - start, "./", "", 0);
   newPCB->priority = true;
   struct QueueNode *node = malloc(sizeof(struct QueueNode));
   node->pcb = newPCB;
@@ -188,31 +188,31 @@ bool execute_process(struct QueueNode *node, int quanta)
       curr_pte->last_used = 0;
 
       // age all other frames in all other PCBs
-      // struct QueueNode *temp = node;
-      // while (temp != NULL)
-      // {
-      //   for (int f = 0; f < 10; f++)
-      //   {
-      //     if ((temp->pcb->pid != pcb->pid) || (temp->pcb->page_table[f].frame != curr_pte->frame))
-      //     {
-      //       if ((temp->pcb->page_table[f].last_used != -1))
-      //       {
-      //         // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
-      //         pcb->page_table[f].last_used = pcb->page_table[f].last_used + 1;
-      //       }
-      //     }
-      //   }
-      //   temp = temp ->next;
-      // }
-
-      for (int f = 0; f < 10; f++)
+      struct QueueNode *temp = node;
+      while (temp != NULL)
       {
-        if ((pcb->page_table[f].last_used != -1) && (pcb->page_table[f].frame != curr_pte->frame))
+        for (int f = 0; f < temp->pcb->page_table_size; f++)
         {
-          // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
-          pcb->page_table[f].last_used = pcb->page_table[f].last_used + 1;
+          if ((temp->pcb->pid != pcb->pid) || (temp->pcb->page_table[f].frame != curr_pte->frame))
+          {
+            if ((temp->pcb->page_table[f].last_used != -1))
+            {
+              // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
+              pcb->page_table[f].last_used = pcb->page_table[f].last_used + 1;
+            }
+          }
         }
+        temp = temp ->next;
       }
+
+      // for (int f = 0; f < 10; f++)
+      // {
+      //   if ((pcb->page_table[f].last_used != -1) && (pcb->page_table[f].frame != curr_pte->frame))
+      //   {
+      //     // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
+      //     pcb->page_table[f].last_used = pcb->page_table[f].last_used + 1;
+      //   }
+      // }
 
       // printf("mem loc is %d\n", mem_loc);
       // printShellMemory();
@@ -268,15 +268,15 @@ bool execute_process(struct QueueNode *node, int quanta)
       }
       else
       {
-        // interrupt process and move it to the back of the ready queue
         // printf("currently on pid %d numlines %d\n", pcb -> pid, pcb->num_lines);
 
-        print_ready_queue();
+        // print_ready_queue();
+        // printShellMemory();
         // ready_queue_add_to_tail(node);
         // struct QueueNode *newNode = ready_queue_pop_head();
         // print_ready_queue();
 
-        printf("is in %s\n", node->pcb->progname);
+        // printf("is in %s\n", node->pcb->progname);
 
         FILE *file = fopen(node->pcb->filename, "rt");
 
@@ -312,7 +312,7 @@ bool execute_process(struct QueueNode *node, int quanta)
         int page_index = get_free_page_frame();
         if (page_index != -1)
         {
-          printf("has free spot %s\n", pcb->progname);
+          // printf("has free spot %s\n", pcb->progname);
           char page_name[20];
           snprintf(page_name, 20, "-%d", pcb->program_counter / 3);
 
@@ -339,7 +339,7 @@ bool execute_process(struct QueueNode *node, int quanta)
           pcb->page_table[pcb->program_counter / 3].last_used = 0;
 
           // pcb->num_lines = pcb->num_lines + char_lines_counter;
-          // pcb->num_blank_lines = pcb ->num_blank_lines + blanks_counter;
+          pcb->num_blank_lines = pcb ->num_blank_lines + blanks_counter;
         }
         else
         {
@@ -347,37 +347,54 @@ bool execute_process(struct QueueNode *node, int quanta)
           int victimFrame;
           int max_age = -10;
 
-          printf("has fault %s\n", pcb->progname);
+          // printf("has fault %s\n", pcb->progname);
 
-          // struct QueueNode *temp = node;
-          // while (temp != NULL) {
-
-          // }
-          for (int v = 0; v < 10; v++)
+          struct QueueNode *temp = node;
+          struct PCB *whichPCB = pcb;
+          int whichIndex = 0;
+          while (temp != NULL)
           {
-            // printf("frame %d age %d\n", pcb->page_table[v].frame, pcb->page_table[v].last_used);
-            if (pcb->page_table[v].last_used > max_age)
+            for (int v = 0; v < temp->pcb->page_table_size; v++)
             {
-              max_age = pcb->page_table[v].last_used;
-              victimFrame = pcb->page_table[v].frame;
+              // printf("frame %d age %d\n", pcb->page_table[v].frame, pcb->page_table[v].last_used);
+              if (temp->pcb->page_table[v].last_used > max_age)
+              {
+                max_age = temp->pcb->page_table[v].last_used;
+                victimFrame = temp->pcb->page_table[v].frame;
+                whichPCB = temp->pcb;
+                whichIndex = v;
+              }
             }
+            temp = temp->next;
           }
+          // for (int v = 0; v < 10; v++)
+          // {
+          //   // printf("frame %d age %d\n", pcb->page_table[v].frame, pcb->page_table[v].last_used);
+          //   if (pcb->page_table[v].last_used > max_age)
+          //   {
+          //     max_age = pcb->page_table[v].last_used;
+          //     victimFrame = pcb->page_table[v].frame;
+          //   }
+          // }
 
           // printShellMemory();
 
-          printf("working with %s\n", pcb->progname);
+          // printf("working with %s\n", pcb->progname);
 
           printf("%s\n\n", "Page fault! Victim page contents:");
 
           for (int v = 0; v < 3; v++)
           {
-            char *victim_line = mem_get_value_at_line((victimFrame * 3) + v);
-            if (strlen(victim_line) > 0)
+            if (lines[v] > 0)
             {
-              printf("%s", victim_line);
+              printf("%s", lines[v]);
             }
           }
           printf("\n%s\n", "End of victim page contents.");
+
+          whichPCB->page_table[victimFrame].frame = -1;
+          whichPCB->page_table[victimFrame].valid = -1;
+          whichPCB->page_table[victimFrame].last_used = -1;
 
           // evict frame
           mem_free_lines_between(victimFrame * 3, (victimFrame * 3) + 2);
@@ -387,8 +404,11 @@ bool execute_process(struct QueueNode *node, int quanta)
           {
             mem_set_by_index((victimFrame * 3) + v, pcb->progname, lines[v]);
           }
-        }
 
+          pcb -> page_table[pcb->program_counter / 3].frame = victimFrame;
+          pcb -> page_table[pcb->program_counter / 3].valid = 1;
+          pcb -> page_table[pcb->program_counter / 3].last_used = 0;
+        }
         return false;
       }
     }
