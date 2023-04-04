@@ -10,12 +10,16 @@
 #include "kernel.h"
 #include "shell.h"
 
-#if defined(X) && defined(Y)
-    int frameSize = X;
-    int varMemSize = Y;
+#if defined(X)
+  int frameSize = X;
 #else
-    int frameSize = 500;
-    int varMemSize = 500;
+  int frameSize = 500;
+#endif
+
+#if defined(Y)
+  int varMemSize = Y;
+#else
+  int varMemSize = 500;
 #endif
 
 int MAX_USER_INPUT = 1000;
@@ -23,8 +27,8 @@ int parseInput(char ui[]);
 
 // ./mysh < ../testcases/assignment3/T_tc1.txt
 // make clean;make mysh fsize=500 vsize=500
-// make clean;make mysh fsize=500 vsize=500;./mysh < ../testcases/assignment3/T_tc1.txt
-// make clean;make mysh fsize=21 vsize=10;./mysh < ../testcases/assignment3/T_tc3.txt
+// make clean;make mysh framesize=500 varmemsize=500;./mysh < ../testcases/assignment3/T_tc1.txt
+// make clean;make mysh framesize=21 varmemsize=10;./mysh < ../testcases/assignment3/T_tc3.txt
 // valgrind --leak-check=yes make mysh fsize=500 vsize=500
 int main(int argc, char *argv[])
 {
@@ -130,43 +134,48 @@ int create_backing_store()
   }
 }
 
-// Code adapted from: https://stackoverflow.com/questions/2256945/removing-a-non-empty-directory-programmatically-in-c-or-c
-int remove_backing_store(const char *path)
-{
-  DIR *dir = opendir(path);
+// Code taken from: https://stackoverflow.com/questions/2256945/removing-a-non-empty-directory-programmatically-in-c-or-c
+int remove_backing_store(const char *path) {
+   DIR *d = opendir(path);
+   size_t path_len = strlen(path);
+   int r = -1;
 
-  if (!dir) {
-    return -1;
-  }
+   if (d) {
+      struct dirent *p;
 
-  struct dirent *dir_entry;
-  int index = -1;
+      r = 0;
+      while (!r && (p=readdir(d))) {
+          int r2 = -1;
+          char *buf;
+          size_t len;
 
-  while (!index && (dir_entry = readdir(dir))) {
-    int i2 = -1;
-    char *buffer;
-    size_t length;
+          /* Skip the names "." and ".." as we don't want to recurse on them. */
+          if (!strcmp(p->d_name, ".") || !strcmp(p->d_name, ".."))
+             continue;
 
-    if (!strcmp(dir_entry -> d_name, ".") || !strcmp(dir_entry->d_name, "..")) {
-      continue;
-    }
+          len = path_len + strlen(p->d_name) + 2; 
+          buf = malloc(len);
 
-    length = strlen(path) + strlen(dir_entry -> d_name) + 2;
-    buffer = malloc(length);
+          if (buf) {
+             struct stat statbuf;
 
-    if (buffer) {
-      struct stat statBuffer;
-      if (!stat(buffer, &statBuffer)) {
-        if (S_ISDIR(statBuffer.st_mode)) {
-          i2 = remove_backing_store(buffer);
-        } else {
-          i2 = unlink(buffer);
-        }
+             snprintf(buf, len, "%s/%s", path, p->d_name);
+             if (!stat(buf, &statbuf)) {
+                if (S_ISDIR(statbuf.st_mode))
+                   r2 = remove_backing_store(buf);
+                else
+                   r2 = unlink(buf);
+             }
+             free(buf);
+          }
+          r = r2;
       }
-      free(buffer);
-    }
-    index = i2;
-  }
-  closedir(dir);
-  return index;
+      closedir(d);
+   }
+
+   if (!r){
+    r = rmdir(path);
+   }
+
+   return r;
 }
