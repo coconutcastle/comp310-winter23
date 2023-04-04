@@ -31,123 +31,10 @@ void unlock_queue()
     pthread_mutex_unlock(&queue_lock);
 }
 
-// int process_initialize(char *filename, char *prog_name, int num_lines)
-// {
-//   FILE *fp;
-//   int error_code = 0;
-//   // int *start = (int *)malloc(sizeof(int));
-//   // int *end = (int *)malloc(sizeof(int));
-
-//   printf("%s\n","in p initialize");
-
-//   fp = fopen(filename, "rt");
-//   if (fp == NULL)
-//   {
-//     error_code = 11; // 11 is the error code for file does not exist
-//     return error_code;
-//   }
-
-//   // error_code = load_file(fp, start, end, filename);
-//   // if (error_code != 0)
-//   // {
-//   //   fclose(fp);
-//   //   return error_code;
-//   // }
-
-//   struct PCB *newPCB = makePCB(num_lines);
-//   struct QueueNode *node = malloc(sizeof(struct QueueNode));
-//   node->pcb = newPCB;
-
-//   lock_queue();
-
-//   int total_lines_stored = 0;
-
-//   // store 2 pages into frame store
-//   for (int page_num = 0; page_num < 2; page_num++)
-//   {
-//     char *lines[3];
-
-//     int line_counter = 0;
-//     char line[101];
-//     int page_line_counter = 0; // number of lines stored
-
-//     // go through all lines in file
-//     while (fgets(line, sizeof(line), fp) != NULL)
-//     {
-
-//       // if number of lines so far within bounds, add to page
-//       if ((line_counter >= page_num * 3) && (line_counter < (page_num + 1) * 3))
-//       {
-//         lines[line_counter % 3] = strdup(line);
-//         page_line_counter++;
-//       }
-//       line_counter++;
-//       memset(line, 0, sizeof(line));
-//     }
-
-//     if (page_line_counter == 0)
-//     {
-//       break;
-//     }
-
-//     // if number of lines stored hasn't reached 3, pad with empty lines
-//     if (page_line_counter < 3)
-//     {
-//       for (int i = page_line_counter; i < 3; i++)
-//       {
-//         lines[i] = "\0";
-//       }
-//     }
-
-//     // now put full page in memory
-
-//     // get first free spot
-//     int page_index = get_free_page_frame();
-
-//     if (page_index != -1)
-//     {
-//       char page_name[3];
-//       snprintf(page_name, 20, "-%d-", page_num);
-
-//       for (int i = 0; i < 3; i++)
-//       {
-//         char line_name[3];
-//         char page_line_name[20];
-
-//         snprintf(page_name, 20, "-%d-", i);
-
-//         strcpy(page_line_name, prog_name);
-//         strcat(page_line_name, page_name);
-//         strcat(page_line_name, line_name);
-
-//         mem_set_by_index(page_index + i, page_line_name, lines[i]);
-//       }
-
-//       newPCB->page_table[page_num].frame = page_index / 3;
-//       newPCB->page_table[page_num].valid = 1;
-//       newPCB->page_table[page_num].age = 0;
-
-//       printf("done setting %d at %d\n", newPCB -> page_table[page_num].frame, page_num);
-//     }
-//     else
-//     {
-//       // no free space to put page, page fault
-//     }
-//   }
-
-//   ready_queue_add_to_tail(node);
-
-//   unlock_queue();
-//   fclose(fp);
-//   return error_code;
-// }
-
 int process_initialize(char *filename, char *prog_name, int num_lines)
 {
   FILE *fp;
   int error_code = 0;
-  // int *start = (int *)malloc(sizeof(int));
-  // int *end = (int *)malloc(sizeof(int));
 
   // printf("%s\n", "in p initialize");
 
@@ -157,13 +44,6 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
     error_code = 11; // 11 is the error code for file does not exist
     return error_code;
   }
-
-  // error_code = load_file(fp, start, end, filename);
-  // if (error_code != 0)
-  // {
-  //   fclose(fp);
-  //   return error_code;
-  // }
 
   struct PCB *newPCB = makePCB(num_lines, filename, prog_name);
   struct QueueNode *node = malloc(sizeof(struct QueueNode));
@@ -238,28 +118,13 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
 
         newPCB->page_table[i].frame = page_index / 3;
         newPCB->page_table[i].valid = 1;
+        newPCB->page_table[i].last_used = 0;
 
         // print_ready_queue();
 
         // printf("pc is %d\n", newPCB->program_counter);
 
         // printf("done setting %d at %d w %d\n", newPCB->page_table[i].frame, i, page_index);
-      }
-      else
-      {
-        // no free space to put page, page fault
-
-        // find least recently used page
-        // init_LRU();
-        // sort_LRU();
-
-        // struct LRU_Node *victim = get_LRU();
-
-        // printf("%s\n", "Page fault! Victim page contents:");
-
-        // printf("%s\n", "End of victim page contents.");
-
-        // struct LRU_PCB *frame_to_evict =
       }
     }
     newPCB->num_blank_lines = blanks_counter;
@@ -301,64 +166,6 @@ int shell_process_initialize()
   return 0;
 }
 
-// bool execute_process(struct QueueNode *node, int quanta)
-// {
-//   // printf("%s\n", "executing policy");
-//   char *line = NULL;
-//   struct PCB *pcb = node->pcb;
-//   int frame;
-
-//   int page_num = (pcb->program_counter) / 3;
-//   struct PTE *curr_pte = &(pcb->page_table[page_num]);
-//   // printf("got pte, and is %d %d\n", page_num, pcb->program_counter);
-
-//   if (curr_pte->valid == 1)
-//   {
-//     // printf("mem loc is %d\n", mem_loc);
-//     // printShellMemory();
-
-//     // printf("valid %d\n", pte->frame);
-
-//     for (int i = 0; i < quanta; i++)
-//     {
-//       int mem_loc = ((curr_pte->frame) * 3) + ((pcb->program_counter) % 3);
-
-//       // printf("mem loc %d %d\n", mem_loc, pte->frame);
-//       // line = mem_get_value_at_line(pcb->PC++);
-
-//       line = mem_get_value_at_line(mem_loc);
-
-//       // printf("Got line %s\n", line);
-
-//       if (strlen(line) > 0)
-//       {
-//         in_background = true;
-
-//         if (pcb->priority)
-//         {
-//           pcb->priority = false;
-//         }
-
-//         if ((pcb->program_counter) >= (pcb->num_lines))
-//         {
-//           parseInput(line);
-//           terminate_process(node);
-//           in_background = false;
-//           return true;
-//         }
-
-//         // printf("%s\n", "hi");
-
-//         parseInput(line);
-//         in_background = false;
-//         pcb->program_counter = pcb->program_counter + 1;
-//       }
-//     }
-//   }
-
-//   return false;
-// }
-
 bool execute_process(struct QueueNode *node, int quanta)
 {
   // printf("%s\n", "executing policy");
@@ -371,19 +178,42 @@ bool execute_process(struct QueueNode *node, int quanta)
   {
     int page_num = (pcb->program_counter) / 3;
     struct PTE *curr_pte = &(pcb->page_table[page_num]);
-    curr_pte->last_used = 0;
-
-    // age all other frames
-    for (int f = 0; f < 10; f++) {
-      if ((pcb->page_table[f].last_used != -1) && (pcb->page_table[f].frame != curr_pte->frame)) {
-        pcb->page_table[f].last_used = pcb->page_table[f].last_used + 1;
-      }
-    }
 
     // printf("got pte, and is %d %d\n", page_num, pcb->program_counter);
+    // printf("working with %s\n", pcb->progname);
 
     if (curr_pte->valid == 1)
     {
+
+      curr_pte->last_used = 0;
+
+      // age all other frames in all other PCBs
+      // struct QueueNode *temp = node;
+      // while (temp != NULL)
+      // {
+      //   for (int f = 0; f < 10; f++)
+      //   {
+      //     if ((temp->pcb->pid != pcb->pid) || (temp->pcb->page_table[f].frame != curr_pte->frame))
+      //     {
+      //       if ((temp->pcb->page_table[f].last_used != -1))
+      //       {
+      //         // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
+      //         pcb->page_table[f].last_used = pcb->page_table[f].last_used + 1;
+      //       }
+      //     }
+      //   }
+      //   temp = temp ->next;
+      // }
+
+      for (int f = 0; f < 10; f++)
+      {
+        if ((pcb->page_table[f].last_used != -1) && (pcb->page_table[f].frame != curr_pte->frame))
+        {
+          // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
+          pcb->page_table[f].last_used = pcb->page_table[f].last_used + 1;
+        }
+      }
+
       // printf("mem loc is %d\n", mem_loc);
       // printShellMemory();
 
@@ -441,7 +271,12 @@ bool execute_process(struct QueueNode *node, int quanta)
         // interrupt process and move it to the back of the ready queue
         // printf("currently on pid %d numlines %d\n", pcb -> pid, pcb->num_lines);
 
-        ready_queue_add_to_tail(node);
+        print_ready_queue();
+        // ready_queue_add_to_tail(node);
+        // struct QueueNode *newNode = ready_queue_pop_head();
+        // print_ready_queue();
+
+        printf("is in %s\n", node->pcb->progname);
 
         FILE *file = fopen(node->pcb->filename, "rt");
 
@@ -450,18 +285,18 @@ bool execute_process(struct QueueNode *node, int quanta)
         int all_lines_counter = 0;
         int char_lines_counter = 0;
         int blanks_counter = 0;
-        char line[101];
+        char line[100];
 
         // go through all lines in file
         while (fgets(line, sizeof(line), file) != NULL)
         {
+          all_lines_counter++;
           if (all_lines_counter >= 3 && char_lines_counter < 3)
           {
             char_lines_counter++;
             lines[char_lines_counter - 1] = strdup(line);
             memset(line, 0, sizeof(line));
           }
-          all_lines_counter++;
         }
 
         if (char_lines_counter < 3)
@@ -477,8 +312,9 @@ bool execute_process(struct QueueNode *node, int quanta)
         int page_index = get_free_page_frame();
         if (page_index != -1)
         {
+          printf("has free spot %s\n", pcb->progname);
           char page_name[20];
-          snprintf(page_name, 20, "-%d", 2);
+          snprintf(page_name, 20, "-%d", pcb->program_counter / 3);
 
           // put all lines for this page in
           for (int j = 0; j < 3; j++)
@@ -498,22 +334,38 @@ bool execute_process(struct QueueNode *node, int quanta)
             mem_set_by_index(page_index + j, page_line_name, lines[j]);
           }
 
-          node->pcb->page_table[2].frame = page_index / 3;
-          node->pcb->page_table[2].valid = 1;
+          pcb->page_table[pcb->program_counter / 3].frame = page_index / 3;
+          pcb->page_table[pcb->program_counter / 3].valid = 1;
+          pcb->page_table[pcb->program_counter / 3].last_used = 0;
+
+          // pcb->num_lines = pcb->num_lines + char_lines_counter;
+          // pcb->num_blank_lines = pcb ->num_blank_lines + blanks_counter;
         }
         else
         {
-
           // search for lru
           int victimFrame;
           int max_age = -10;
 
-          for (int v = 0; v < 10; v++) {
-            if (pcb->page_table[v].last_used > max_age) {
-              max_age = pcb -> page_table[v].last_used;
+          printf("has fault %s\n", pcb->progname);
+
+          // struct QueueNode *temp = node;
+          // while (temp != NULL) {
+
+          // }
+          for (int v = 0; v < 10; v++)
+          {
+            // printf("frame %d age %d\n", pcb->page_table[v].frame, pcb->page_table[v].last_used);
+            if (pcb->page_table[v].last_used > max_age)
+            {
+              max_age = pcb->page_table[v].last_used;
               victimFrame = pcb->page_table[v].frame;
             }
           }
+
+          // printShellMemory();
+
+          printf("working with %s\n", pcb->progname);
 
           printf("%s\n\n", "Page fault! Victim page contents:");
 
@@ -531,15 +383,13 @@ bool execute_process(struct QueueNode *node, int quanta)
           mem_free_lines_between(victimFrame * 3, (victimFrame * 3) + 2);
 
           // load new frame into evicted frame spot
-          for (int v = 0; v < 3; v++) {
+          for (int v = 0; v < 3; v++)
+          {
             mem_set_by_index((victimFrame * 3) + v, pcb->progname, lines[v]);
           }
         }
 
         return false;
-
-        // terminate_process(node);
-        // return true;    // ugh this was the only thing that would make the program quit properly
       }
     }
   }
