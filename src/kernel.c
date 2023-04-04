@@ -55,7 +55,7 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
   char *lines[6]; // you only load 6 lines initially
   int line_counter = 0;
   int blanks_counter = 0;
-  char line[101];
+  char line[100];
 
   // print_ready_queue();
 
@@ -131,6 +131,7 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
   }
 
   // print_ready_queue();
+  // printShellMemory();
 
   ready_queue_add_to_tail(node);
 
@@ -217,7 +218,7 @@ bool execute_process(struct QueueNode *node, int quanta)
       // printf("mem loc is %d\n", mem_loc);
       // printShellMemory();
 
-      // printf("valid %d\n", pte->frame);
+      // printf("valid %d\n", curr_pte->frame);
 
       // frame = 0;
 

@@ -324,6 +324,7 @@ int get_free_page_frame()
   int i;
   int free_index = 0;
   int free_count = 0; // needs to reach 3 to count as a free spot
+  // printf("finding");
 
   for (i = 0; i < var_store_start; i++)
   {
@@ -338,6 +339,7 @@ int get_free_page_frame()
     }
     if (free_count == 3)
     {
+      // printf("%d\n", free_index);
       return free_index;
     }
   }
