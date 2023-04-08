@@ -174,15 +174,14 @@ bool execute_process(struct QueueNode *node, int quanta)
   // printf("%s\n", "executing policy");
   char *line = NULL;
   struct PCB *pcb = node->pcb;
-  int frame;
   int i = 0;
 
-  while (i < quanta)
+  while (i < quanta && (pcb->program_counter < pcb->num_lines + pcb->num_blank_lines))
   {
     int page_num = (pcb->program_counter) / 3;
     struct PTE *curr_pte = &(pcb->page_table[page_num]);
 
-    // printf("got pte, and is %d %d\n", page_num, pcb->program_counter);
+    // printf("got pte, and is %d %d\n", pcb->last_frame, pcb->program_counter);
     // printf("working with %s\n", pcb->progname);
 
     if (curr_pte->valid == 1)
@@ -235,7 +234,7 @@ bool execute_process(struct QueueNode *node, int quanta)
           pcb->priority = false;
         }
 
-        if ((pcb->program_counter) == (pcb->num_lines + pcb->num_blank_lines))
+        if ((pcb->program_counter) >= (pcb->num_lines + pcb->num_blank_lines))
         {
           parseInput(line);
           terminate_process(node);
@@ -249,7 +248,6 @@ bool execute_process(struct QueueNode *node, int quanta)
         in_background = false;
       }
       pcb->program_counter = pcb->program_counter + 1;
-      // frame++;
       i++;
     }
     else
@@ -417,6 +415,12 @@ bool execute_process(struct QueueNode *node, int quanta)
         return false;
       }
     }
+  }
+  if (pcb->program_counter >= pcb->num_lines + pcb->num_blank_lines)
+  {
+    terminate_process(node);
+    in_background = false;
+    return true;
   }
   return false;
 }

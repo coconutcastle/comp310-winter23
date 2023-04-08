@@ -23,6 +23,7 @@ struct PCB *makePCB(int num_lines, char *filename, char *progname, int page_tabl
   newPCB->priority = false;
   newPCB->page_table_size = 10;
   newPCB->num_blank_lines = 0;
+  newPCB->last_frame = 0;
 
   // printf("made pcb with numlines %d\n", num_lines);
 

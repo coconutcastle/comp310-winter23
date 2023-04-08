@@ -361,7 +361,7 @@ char *mem_get_value_at_line(int index)
 {
   // printf("getting line at %d\n", index);
   if (index < 0 || index > SHELL_MEM_LENGTH)
-    return NULL;
+    return "";
   return shellmemory[index].value;
 }
 

@@ -30,6 +30,7 @@ struct PCB
   char *filename;
   char *progname;
   int page_table_size;
+  int last_frame;   //holds the location of the frame at the current pc
 
   // page table
   struct PTE page_table[10];
