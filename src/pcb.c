@@ -21,9 +21,8 @@ struct PCB *makePCB(int num_lines, char *filename, char *progname, int page_tabl
   newPCB->progname = strdup(progname);
   newPCB->num_lines = num_lines;
   newPCB->priority = false;
-  newPCB->page_table_size = 10;
+  newPCB->page_table_size = 15;
   newPCB->num_blank_lines = 0;
-  newPCB->last_frame = 0;
 
   // printf("made pcb with numlines %d\n", num_lines);
 

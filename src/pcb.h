@@ -25,15 +25,13 @@ struct PCB
   int program_counter;
   int num_lines;
   int num_blank_lines;
-  int mem_start;
   int job_length_score;
   char *filename;
   char *progname;
   int page_table_size;
-  int last_frame;   //holds the location of the frame at the current pc
 
   // page table
-  struct PTE page_table[10];
+  struct PTE page_table[15];
 };
 
 int generatePID();
