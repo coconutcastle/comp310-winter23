@@ -176,15 +176,15 @@ bool execute_process(struct QueueNode *node, int quanta)
   while (i < quanta && (pcb->program_counter < pcb->num_lines + pcb->num_blank_lines))
   {
     int page_num = (pcb->program_counter) / 3;
-    struct PTE *curr_pte = &(pcb->page_table[page_num]);
+    struct Page *curr_page = &(pcb->page_table[page_num]);
 
-    if (curr_pte->valid == 1)
+    if (curr_page->frame != -1)
     {
       // age all other frames in all PCBs, then set current frame age to 0
       age_all_nodes();
-      curr_pte->last_used = 0;
+      curr_page->last_used = 0;
 
-      int mem_loc = ((curr_pte->frame) * 3) + ((pcb->program_counter) % 3);
+      int mem_loc = ((curr_page->frame) * 3) + ((pcb->program_counter) % 3);
       line = mem_get_value_at_line(mem_loc);
 
       if (strlen(line) > 0 && strcmp(line, "none") != 0) // check if blank line
@@ -271,10 +271,8 @@ bool execute_process(struct QueueNode *node, int quanta)
           }
 
           pcb->page_table[pcb->program_counter / 3].frame = page_index / 3;
-          pcb->page_table[pcb->program_counter / 3].valid = 1;
           pcb->page_table[pcb->program_counter / 3].last_used = 0;
 
-          // pcb->num_lines = pcb->num_lines + char_lines_counter;
           pcb->num_blank_lines = pcb->num_blank_lines + blanks_counter;
         }
 
@@ -300,7 +298,6 @@ bool execute_process(struct QueueNode *node, int quanta)
           printf("\n%s\n", "End of victim page contents.");
 
           whichPCB->page_table[whichIndex].frame = -1;
-          whichPCB->page_table[whichIndex].valid = -1;
           whichPCB->page_table[whichIndex].last_used = -1;
 
           // evict frame
@@ -313,7 +310,6 @@ bool execute_process(struct QueueNode *node, int quanta)
           }
 
           pcb->page_table[pcb->program_counter / 3].frame = victimFrame;
-          pcb->page_table[pcb->program_counter / 3].valid = 1;
           pcb->page_table[pcb->program_counter / 3].last_used = 0;
           
           free(lru);
@@ -608,23 +604,16 @@ int insert_frame(FILE *fp, struct PCB *pcb, char *prog_name, int max_lines, int 
         char page_name[20];
         snprintf(page_name, 20, "-%d", i);
 
-        // put all lines for this page in
+        // put all lines for this page in memory
         for (int j = 0; j < 3; j++)
         {
-          char line_name[20];
           char page_line_name[100];
-
-          snprintf(line_name, 20, "-%d", j);
-
-          strcpy(page_line_name, prog_name);
-          strcat(page_line_name, page_name);
-          strcat(page_line_name, line_name);
+          snprintf(page_line_name, 100, "%s%s-%d", prog_name, page_name, j);
 
           mem_set_by_index(page_index + j, page_line_name, lines[(i * 3) + j]);
         }
 
         pcb->page_table[i].frame = page_index / 3;
-        pcb->page_table[i].valid = 1;
         pcb->page_table[i].last_used = 0;
       }
     }

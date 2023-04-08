@@ -29,17 +29,9 @@ struct PCB *makePCB(int num_lines, char *filename, char *progname, int page_tabl
   // create frame table, all invalid for now
   for (int i = 0; i < newPCB->page_table_size; i++)
   {
-    newPCB->page_table[i].valid = -1;
     newPCB->page_table[i].frame = -1;
     newPCB->page_table[i].last_used = -1;
   }
 
   return newPCB;
-}
-
-// return frame number of lru in pcb
-int find_lru_frame(struct PCB *pcb) {
-  for (int i = 0; i < 10; i++) {
-
-  }
 }

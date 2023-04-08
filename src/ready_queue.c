@@ -112,6 +112,7 @@ void print_node_ages()
   }
 }
 
+// iterate through list of all PCB nodes and their frames to find the least recently used
 struct LRU_frame *find_lru()
 {
   struct LRU_frame *lru = malloc(sizeof(struct LRU_frame));
@@ -125,7 +126,6 @@ struct LRU_frame *find_lru()
     if (all_nodes[i] != NULL)
     {
       struct QueueNode *curr_node = all_nodes[i];
-      // printf("looking at %s\n", curr_node->pcb->progname);
       for (int j = 0; j < curr_node->pcb->page_table_size; j++)
       {
         if (curr_node->pcb->page_table[j].last_used > max_age)
@@ -176,13 +176,13 @@ void terminate_process(struct QueueNode *node)
   // node should not be in the ready queue
 
   // get all pages associated with process, always in chunks of 3
-  struct PTE *pte = node->pcb->page_table;
+  struct Page *page = node->pcb->page_table;
 
   for (int i = 0; i < node->pcb->page_table_size; i++)
   {
-    if (pte[i].valid == 1)
+    if (page[i].frame != -1)
     {
-      mem_free_lines_between(pte[i].frame * 3, (pte[i].frame * 3) + 2);
+      mem_free_lines_between(page[i].frame * 3, (page[i].frame * 3) + 2);
     }
   }
 

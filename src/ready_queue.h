@@ -12,7 +12,7 @@ struct QueueNode {
 
 struct LRU_frame {
   struct PCB *pcb;
-  int page_index;
+  int page_index;     // index of the frame in its specific PCB page table
   int victimFrame;
 };
 

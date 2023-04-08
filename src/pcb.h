@@ -2,10 +2,9 @@
 #define PCB_H
 #include <stdbool.h>
 
-struct PTE
+struct Page
 {
-  int frame;
-  int valid;
+  int frame;        // frame in memory - multiply by 3 to get mem location
   int last_used;    // the longer its been since its been accessed, the larger the number gets
 };
 
@@ -31,7 +30,7 @@ struct PCB
   int page_table_size;
 
   // page table
-  struct PTE page_table[15];
+  struct Page page_table[15];    // I'm just going to assume that 15 frames is enough to hold each program
 };
 
 int generatePID();
