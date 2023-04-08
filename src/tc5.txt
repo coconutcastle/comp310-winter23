@@ -16,13 +16,4 @@ echo P8L3
 End of victim page contents.
 P8L7
 P8L8
-P8L9
-Page fault! Victim page contents:
-
-echo P8L4
-echo P8L5
-echo P8L6
-
-End of victim page contents.
-P8L10
 Bye!
