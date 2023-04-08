@@ -132,7 +132,7 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
 
   // print_ready_queue();
   // printShellMemory();
-  
+
   int in_frame_code = insert_frame(fp, newPCB, prog_name, 6, num_lines);
 
   ready_queue_add_to_tail(node);
@@ -205,7 +205,7 @@ bool execute_process(struct QueueNode *node, int quanta)
             }
           }
         }
-        temp = temp ->next;
+        temp = temp->next;
       }
 
       // for (int f = 0; f < 10; f++)
@@ -227,7 +227,7 @@ bool execute_process(struct QueueNode *node, int quanta)
 
       line = mem_get_value_at_line(mem_loc);
       // printf("Got line %s\n", line);
-      if (strlen(line) > 0 && strcmp(line, "none") != 0)    // check if blank line
+      if (strlen(line) > 0 && strcmp(line, "none") != 0) // check if blank line
       {
         in_background = true;
         if (pcb->priority)
@@ -235,7 +235,7 @@ bool execute_process(struct QueueNode *node, int quanta)
           pcb->priority = false;
         }
 
-        if ((pcb->program_counter) >= (pcb->num_lines + pcb->num_blank_lines))
+        if ((pcb->program_counter) == (pcb->num_lines + pcb->num_blank_lines))
         {
           parseInput(line);
           terminate_process(node);
@@ -291,10 +291,11 @@ bool execute_process(struct QueueNode *node, int quanta)
         while (fgets(line, sizeof(line), file) != NULL)
         {
           all_lines_counter++;
-          if (all_lines_counter >= 3 && char_lines_counter < 3)
+          if (all_lines_counter > pcb->program_counter && char_lines_counter < 3)
           {
             char_lines_counter++;
             lines[char_lines_counter - 1] = strdup(line);
+            // printf("new %s", line);
             memset(line, 0, sizeof(line));
           }
         }
@@ -306,6 +307,7 @@ bool execute_process(struct QueueNode *node, int quanta)
             blanks_counter++;
             lines[c] = "\0";
           }
+          // printf("added blanks %d\n", blanks_counter);
         }
 
         // get first free spot
@@ -339,8 +341,9 @@ bool execute_process(struct QueueNode *node, int quanta)
           pcb->page_table[pcb->program_counter / 3].last_used = 0;
 
           // pcb->num_lines = pcb->num_lines + char_lines_counter;
-          pcb->num_blank_lines = pcb ->num_blank_lines + blanks_counter;
+          pcb->num_blank_lines = pcb->num_blank_lines + blanks_counter;
         }
+
         else
         {
           // search for lru
@@ -385,9 +388,11 @@ bool execute_process(struct QueueNode *node, int quanta)
 
           for (int v = 0; v < 3; v++)
           {
-            if (lines[v] > 0)
+            char *victim_line = mem_get_value_at_line((victimFrame * 3) + (victimFrame + v));
+
+            if (strlen(victim_line) > 0 && strcmp(victim_line, "none") != 0)
             {
-              printf("%s", lines[v]);
+              printf("%s", victim_line);
             }
           }
           printf("\n%s\n", "End of victim page contents.");
@@ -405,9 +410,9 @@ bool execute_process(struct QueueNode *node, int quanta)
             mem_set_by_index((victimFrame * 3) + v, pcb->progname, lines[v]);
           }
 
-          pcb -> page_table[pcb->program_counter / 3].frame = victimFrame;
-          pcb -> page_table[pcb->program_counter / 3].valid = 1;
-          pcb -> page_table[pcb->program_counter / 3].last_used = 0;
+          pcb->page_table[pcb->program_counter / 3].frame = victimFrame;
+          pcb->page_table[pcb->program_counter / 3].valid = 1;
+          pcb->page_table[pcb->program_counter / 3].last_used = 0;
         }
         return false;
       }
@@ -665,7 +670,8 @@ int schedule_by_policy(char *policy, bool mt)
   }
 }
 
-int insert_frame(FILE *fp, struct PCB *pcb, char *prog_name, int max_lines, int num_lines) {
+int insert_frame(FILE *fp, struct PCB *pcb, char *prog_name, int max_lines, int num_lines)
+{
 
   char *lines[max_lines]; // you only load 6 lines initially
   int line_counter = 0;
@@ -742,5 +748,4 @@ int insert_frame(FILE *fp, struct PCB *pcb, char *prog_name, int max_lines, int 
     }
     pcb->num_blank_lines = pcb->num_blank_lines + blanks_counter;
   }
-
 }
