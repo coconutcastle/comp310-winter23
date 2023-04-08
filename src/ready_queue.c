@@ -78,6 +78,30 @@ void ready_queue_add_to_tail(struct QueueNode *node)
   }
 }
 
+// void age_all_nodes(struct PCB *curr_pcb, int curr_frame)
+// {
+//   // printf("%s\n", "now aging");
+//   for (int i = 0; i < 3; i++)
+//   {
+//     if (all_nodes[i] != NULL)
+//     {
+//       struct QueueNode *curr_node = all_nodes[i];
+//       for (int j = 0; j < curr_node->pcb->page_table_size; j++)
+//       {
+//         if ((curr_node->pcb->pid != curr_pcb->pid) || (curr_node->pcb->page_table[i].frame != curr_frame))
+//         {
+//           if ((curr_node->pcb->page_table[j].last_used != -1))
+//           {
+//             // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
+//             curr_node->pcb->page_table[j].last_used = curr_node->pcb->page_table[j].last_used + 1;
+//           }
+//         }
+//       }
+//     }
+//   }
+//   // printf("%s\n", "done aging");
+// }
+
 void age_all_nodes(struct PCB *curr_pcb, int curr_frame)
 {
   // printf("%s\n", "now aging");
@@ -88,18 +112,35 @@ void age_all_nodes(struct PCB *curr_pcb, int curr_frame)
       struct QueueNode *curr_node = all_nodes[i];
       for (int j = 0; j < curr_node->pcb->page_table_size; j++)
       {
-        if ((curr_node->pcb->pid != curr_pcb->pid) || (curr_node->pcb->page_table[i].frame != curr_frame))
-        {
           if ((curr_node->pcb->page_table[j].last_used != -1))
           {
             // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
             curr_node->pcb->page_table[j].last_used = curr_node->pcb->page_table[j].last_used + 1;
           }
-        }
+        
       }
     }
   }
   // printf("%s\n", "done aging");
+}
+
+void print_node_ages()
+{
+  for (int i = 0; i < 3; i++)
+  {
+    if (all_nodes[i] != NULL)
+    {
+      struct QueueNode *curr_node = all_nodes[i];
+      for (int j = 0; j < curr_node->pcb->page_table_size; j++)
+      {
+
+        if ((curr_node->pcb->page_table[j].last_used != -1))
+        {
+          printf("program %s, frame %d, age %d\n", curr_node->pcb->progname, curr_node->pcb->page_table[j].frame, curr_node->pcb->page_table[j].last_used);
+        }
+      }
+    }
+  }
 }
 
 struct LRU_frame *find_lru()

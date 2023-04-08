@@ -32,5 +32,6 @@ int ready_queue_get_shortest_job_score();
 void ready_queue_promote(int score);
 void age_all_nodes(struct PCB *curr_pcb, int curr_frame);
 struct LRU_frame *find_lru();
+void print_node_ages();
 
 #endif

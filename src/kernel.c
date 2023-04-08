@@ -341,6 +341,8 @@ bool execute_process(struct QueueNode *node, int quanta)
           struct PCB *whichPCB = lru->pcb;
           int whichIndex = lru->page_index;
 
+          // print_node_ages();
+
           // printf("victim frame is %d\n", victimFrame);
 
           printf("%s\n\n", "Page fault! Victim page contents:");
