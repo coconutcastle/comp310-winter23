@@ -255,12 +255,15 @@ bool execute_process(struct QueueNode *node, int quanta)
       // printShellMemory();
       // print_ready_queue();
 
+      // printf("%d\n", curr_pte->valid);
+
       // printf("for prog w %d lines and %d spaces, pc=%d\n", pcb->num_lines, pcb->num_blank_lines, pcb->program_counter);
 
       // if the pc is numlines + numblanks, then program is finished
       // otherwise, its a page fault
       if (pcb->program_counter == (pcb->num_blank_lines + pcb->num_lines))
       {
+        // printf("%s\n", "terminating");
         terminate_process(node);
         return true;
       }
@@ -395,9 +398,9 @@ bool execute_process(struct QueueNode *node, int quanta)
           }
           printf("\n%s\n", "End of victim page contents.");
 
-          whichPCB->page_table[victimFrame].frame = -1;
-          whichPCB->page_table[victimFrame].valid = -1;
-          whichPCB->page_table[victimFrame].last_used = -1;
+          whichPCB->page_table[whichIndex].frame = -1;
+          whichPCB->page_table[whichIndex].valid = -1;
+          whichPCB->page_table[whichIndex].last_used = -1;
 
           // evict frame
           mem_free_lines_between(victimFrame * 3, (victimFrame * 3) + 2);
@@ -418,8 +421,8 @@ bool execute_process(struct QueueNode *node, int quanta)
   }
   if (pcb->program_counter >= pcb->num_lines + pcb->num_blank_lines)
   {
-    terminate_process(node);
-    in_background = false;
+    // terminate_process(node);
+    // in_background = false;
     return true;
   }
   return false;
