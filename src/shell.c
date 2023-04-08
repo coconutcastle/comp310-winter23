@@ -28,6 +28,7 @@ int parseInput(char ui[]);
 // ./mysh < ../testcases/assignment3/T_tc1.txt
 // make clean;make mysh fsize=500 vsize=500
 // make clean;make mysh framesize=500 varmemsize=500;./mysh < ../testcases/assignment3/T_tc1.txt
+// make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc1.txt > tc1.txt;diff -w tc1.txt ../testcases/assignment3/T_tc1_result.txt
 // make clean;make mysh framesize=21 varmemsize=10;./mysh < ../testcases/assignment3/T_tc3.txt
 // make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc2.txt
 // make clean;make mysh framesize=6 varmemsize=10;./mysh < ../testcases/assignment3/T_tc5.txt
@@ -134,6 +135,60 @@ int create_backing_store()
   else {
     return -1;
   }
+}
+
+int copy_file(char *filename, char *new_filename) {
+
+  char filepath[100];
+  strcpy(filepath, "../testcases/assignment3/");
+  strcat(filepath, filename);
+
+  // open program file
+  FILE *program = fopen(filepath, "rt");
+
+  if (program == NULL)
+  {
+    return -1;
+  }
+
+  FILE *file = fopen(new_filename, "w");
+
+  int line_count = 0;
+  char prog_line[1000];
+
+  while (fgets(prog_line, sizeof(prog_line), program) != NULL)
+  {
+    // printf("%s\n", prog_line);
+    char *semi_c_index = strchr(prog_line, ';');
+    if (semi_c_index != NULL)
+    {
+      char *token = strtok(prog_line, ";");
+      int token_count = 0;
+
+      while (token != NULL)
+      {
+        if (token_count > 0)
+        {
+          fprintf(file, "%s", token);
+        }
+        else
+        {
+          fprintf(file, "%s\n", token);
+        }
+        token = strtok(NULL, ";");
+        line_count++;
+        token_count++;
+      }
+      continue;
+    }
+
+    fprintf(file, "%s", prog_line);
+    line_count++;
+  }
+  fclose(file);
+  fclose(program);
+
+  return line_count;
 }
 
 // Code taken from: https://stackoverflow.com/questions/2256945/removing-a-non-empty-directory-programmatically-in-c-or-c

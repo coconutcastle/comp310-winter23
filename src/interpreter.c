@@ -360,54 +360,14 @@ int run(char *script)
   int errCode = 0;
   // load script into shell
 
-  char prog_path[100];
-  strcpy(prog_path, "../testcases/assignment3/");
-  strcat(prog_path, script);
-
-  // open program file
-  FILE *program = fopen(prog_path, "rt");
-
-  if (program == NULL)
-  {
-    return handleError(11);
-  }
-
   char prog_filename[100];
   snprintf(prog_filename, sizeof(prog_filename), "%s%s%s", "./backing_store/", script, ".txt");
 
-  FILE *file = fopen(prog_filename, "w");
+  int line_count = copy_file(script, prog_filename);
 
-  int line_count = 0;
-  char prog_line[1000];
-
-  while (fgets(prog_line, sizeof(prog_line), program) != NULL)
+  if (line_count == -1)
   {
-    // printf("%s\n", prog_line);
-    char *semi_c_index = strchr(prog_line, ';');
-    if (semi_c_index != NULL)
-    {
-      char *token = strtok(prog_line, ";");
-      int token_count = 0;
-
-      while (token != NULL)
-      {
-        if (token_count > 0)
-        {
-          fprintf(file, "%s", token);
-        }
-        else
-        {
-          fprintf(file, "%s\n", token);
-        }
-        token = strtok(NULL, ";");
-        line_count++;
-        token_count++;
-      }
-      continue;
-    }
-
-    fprintf(file, "%s", prog_line);
-    line_count++;
+    return handleError(11);
   }
 
   errCode = process_initialize(prog_filename, script, line_count);
@@ -451,65 +411,15 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
 
     if (fnames[i] != NULL)
     {
-      char prog_path[100];
-      strcpy(prog_path, "../testcases/assignment3/");
-      strcat(prog_path, fnames[i]);
-
-      // open program file
-      FILE *program = fopen(prog_path, "rt");
-
-      if (program == NULL)
-      {
-        return handleError(11);
-      }
-
       char prog_filename[100];
       snprintf(prog_filename, sizeof(prog_filename), "%s%s%s", "./backing_store/", fnames[i], ".txt");
 
-      FILE *file = fopen(prog_filename, "w");
+      int line_count = copy_file(fnames[i], prog_filename);
 
-      if (file == NULL)
+      if (line_count == -1)
       {
-        printf("%s\n", "Program file does not exist");
+        return handleError(11);
       }
-
-      int line_count = 0;
-      char prog_line[1000];
-
-      while (fgets(prog_line, sizeof(prog_line), program) != NULL)
-      {
-        // check if a line is split up by semicolons - if so, add them on separate lines
-        char *semi_c_index = strchr(prog_line, ';');
-        if (semi_c_index != NULL)
-        {
-          char *token = strtok(prog_line, ";");
-          int token_count = 0;
-
-          while (token != NULL)
-          {
-            if (token_count > 0)
-            {
-              fprintf(file, "%s", token);
-            }
-            else
-            {
-              fprintf(file, "%s\n", token);
-            }
-            token = strtok(NULL, ";");
-            line_count++;
-            token_count++;
-          }
-          continue;
-        }
-
-        fprintf(file, "%s", prog_line);
-        line_count++;
-      }
-
-      fclose(file);
-      fclose(program);
-
-      // printf("%s\n", "initializing process");
 
       // initialize PCB with copied program
       error_code = process_initialize(prog_filename, fnames[i], line_count);

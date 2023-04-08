@@ -328,6 +328,7 @@ int get_free_page_frame()
 
   for (i = 0; i < var_store_start; i++)
   {
+    // printf("%s\n", shellmemory[i].value);
     if (strcmp(shellmemory[i].var, "none") == 0)
     {
       free_count++;
