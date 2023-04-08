@@ -398,8 +398,6 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
   }
   int error_code = 0;
 
-  // int valid_programs[] = {0, 0, 0};
-  // printf("%s\n","in exec");
   char *fnames[] = {fname1, fname2, fname3};
 
   if (background)

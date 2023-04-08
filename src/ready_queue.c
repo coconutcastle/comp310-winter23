@@ -13,13 +13,6 @@
 
 struct QueueNode *head = NULL;
 
-// struct LRU_Node *LRU_head;
-// struct LRU_Node *LRU_tail;
-
-// int init_LRU() {
-  
-// }
-
 void ready_queue_destory()
 {
     if(!head) return;
@@ -85,11 +78,6 @@ void terminate_process(struct QueueNode *node){
     }
 
     // printf("%s\n", "terminated");
-
-    // printShellMemory();
-
-    // mem_free_lines_between(node->pcb->start, node->pcb->end);
-
     free(node);
 }
 

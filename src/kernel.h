@@ -7,4 +7,5 @@ int schedule_by_policy(char* policy, bool mt);
 int shell_process_initialize();
 void ready_queue_destory();
 void threads_terminate();
+int insert_frame(FILE *fp, struct PCB *pcb, char *prog_name, int max_lines, int num_lines);
 #endif

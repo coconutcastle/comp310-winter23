@@ -19,11 +19,10 @@ struct PCB *makePCB(int num_lines, char *filename, char *progname, int page_tabl
   newPCB->program_counter = 0;
   newPCB->filename = strdup(filename);
   newPCB->progname = strdup(progname);
-  // newPCB->start  = start;
-  // newPCB->end = end;
   newPCB->num_lines = num_lines;
   newPCB->priority = false;
   newPCB->page_table_size = 10;
+  newPCB->num_blank_lines = 0;
 
   // printf("made pcb with numlines %d\n", num_lines);
 

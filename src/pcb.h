@@ -26,8 +26,6 @@ struct PCB
   int num_lines;
   int num_blank_lines;
   int mem_start;
-  // int start;
-  // int end;
   int job_length_score;
   char *filename;
   char *progname;
@@ -36,11 +34,6 @@ struct PCB
   // page table
   struct PTE page_table[10];
 };
-
-// struct Page
-// {
-//   char *lines[3];
-// }
 
 int generatePID();
 struct PCB *makePCB(int numlines, char *filename, char *progname, int page_table_size);
