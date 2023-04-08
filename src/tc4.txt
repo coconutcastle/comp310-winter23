@@ -1,0 +1,72 @@
+Shell version 1.2 Created January 2023
+
+Frame Store Size = 18; Variable Store Size = 10
+P10L1
+P11L1
+P12L1
+P12L2
+PTenLineTwoSet
+P10L3
+PEightLineTwoSet
+P11L3
+P12L3
+P12L4
+PTenLineTwoSet
+P10L5
+PEightLineTwoSet
+P11L5
+P12L5
+P12L6
+Page fault! Victim page contents:
+
+echo P10L1
+set a PTenLineTwoSet
+ print a
+
+End of victim page contents.
+Page fault! Victim page contents:
+
+echo P12L5
+echo P12L6
+PTenLineTwoSet
+End of victim page contents.
+Page fault! Victim page contents:
+
+ print w
+echo P11L3
+echo $w
+
+End of victim page contents.
+PTenLineSixSet
+P11L6
+P11L7
+P12L7
+P12L8
+P10L7
+P11L8
+Page fault! Victim page contents:
+
+echo $a
+echo P10L5
+echo P12L7
+
+End of victim page contents.
+P12L9
+Page fault! Victim page contents:
+
+echo P11L6
+echo P11L7
+echo P11L8
+
+End of victim page contents.
+P11L9
+P11L10
+P12L10
+P12L11
+P12L12
+Page fault! Victim page contents:
+
+
+End of victim page contents.
+P12L13
+Bye!

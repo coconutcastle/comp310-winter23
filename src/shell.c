@@ -30,10 +30,17 @@ int parseInput(char ui[]);
 // make clean;make mysh framesize=500 varmemsize=500;./mysh < ../testcases/assignment3/T_tc1.txt
 // make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc1.txt > tc1.txt;diff -w tc1.txt ../testcases/assignment3/T_tc1_result.txt
 // make clean;make mysh framesize=21 varmemsize=10;./mysh < ../testcases/assignment3/T_tc3.txt
+// make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc4.txt > tc4.txt;diff -w tc4.txt ../testcases/assignment3/T_tc4_result.txt
 // make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc2.txt
 // make clean;make mysh framesize=6 varmemsize=10;./mysh < ../testcases/assignment3/T_tc5.txt
 // make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc6.txt
+// make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc6.txt > tc6.txt;diff -w tc6.txt ../testcases/assignment3/T_tc6_result.txt
+// make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc7.txt > tc7.txt;diff -w tc7.txt ../testcases/assignment3/T_tc7_result.txt
 // make clean;make mysh framesize=21 varmemsize=10;./mysh < ../testcases/assignment3/T_tc8.txt
+// make clean;make mysh framesize=21 varmemsize=10;./mysh < ../testcases/assignment3/T_tc8.txt > tc8.txt;diff -w tc8.txt ../testcases/assignment3/T_tc8_result.txt
+// make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc9.txt
+// make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc9.txt > tc9.txt;diff -w tc9.txt ../testcases/assignment3/T_tc9_result.txt
+// make clean;make mysh framesize=6 varmemsize=10;./mysh < ../testcases/assignment3/T_tc10.txt > tc10.txt;diff -w tc10.txt ../testcases/assignment3/T_tc10_result.txt
 // valgrind --leak-check=yes make mysh fsize=500 vsize=500
 int main(int argc, char *argv[])
 {

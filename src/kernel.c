@@ -169,12 +169,16 @@ int shell_process_initialize()
   return 0;
 }
 
-bool execute_process(struct QueueNode *node, int quanta)
+bool execute_process(struct QueueNode *node, int quanta, struct QueueNode *head_node)
 {
   // printf("%s\n", "executing policy");
   char *line = NULL;
   struct PCB *pcb = node->pcb;
   int i = 0;
+
+  // print_ready_queue();
+
+  // struct QueueNode *head_node = ready_queue_get_head();
 
   while (i < quanta && (pcb->program_counter < pcb->num_lines + pcb->num_blank_lines))
   {
@@ -186,35 +190,29 @@ bool execute_process(struct QueueNode *node, int quanta)
 
     if (curr_pte->valid == 1)
     {
-
-      curr_pte->last_used = 0;
-
       // age all other frames in all other PCBs
-      struct QueueNode *temp = node;
-      while (temp != NULL)
-      {
-        for (int f = 0; f < temp->pcb->page_table_size; f++)
-        {
-          if ((temp->pcb->pid != pcb->pid) || (temp->pcb->page_table[f].frame != curr_pte->frame))
-          {
-            if ((temp->pcb->page_table[f].last_used != -1))
-            {
-              // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
-              pcb->page_table[f].last_used = pcb->page_table[f].last_used + 1;
-            }
-          }
-        }
-        temp = temp->next;
-      }
+      // printf("on node %s\n", ready_queue_get_head()->pcb->progname);
 
-      // for (int f = 0; f < 10; f++)
+      // struct QueueNode *temp = head_node == NULL ? node : head_node;
+      // // struct QueueNode *temp = node;
+      // while (temp != NULL)
       // {
-      //   if ((pcb->page_table[f].last_used != -1) && (pcb->page_table[f].frame != curr_pte->frame))
+      //   for (int f = 0; f < temp->pcb->page_table_size; f++)
       //   {
-      //     // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
-      //     pcb->page_table[f].last_used = pcb->page_table[f].last_used + 1;
+      //     if ((temp->pcb->pid != pcb->pid) || (temp->pcb->page_table[f].frame != curr_pte->frame))
+      //     {
+      //       if ((temp->pcb->page_table[f].last_used != -1))
+      //       {
+      //         // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
+      //         pcb->page_table[f].last_used = pcb->page_table[f].last_used + 1;
+      //       }
+      //     }
       //   }
+      //   temp = temp->next;
       // }
+
+      age_all_nodes(pcb, curr_pte->frame);
+      curr_pte->last_used = 0;
 
       // printf("mem loc is %d\n", mem_loc);
       // printShellMemory();
@@ -237,7 +235,7 @@ bool execute_process(struct QueueNode *node, int quanta)
         if ((pcb->program_counter) >= (pcb->num_lines + pcb->num_blank_lines))
         {
           parseInput(line);
-          terminate_process(node);
+          // terminate_process(node);
           in_background = false;
           return true;
         }
@@ -264,7 +262,7 @@ bool execute_process(struct QueueNode *node, int quanta)
       if (pcb->program_counter == (pcb->num_blank_lines + pcb->num_lines))
       {
         // printf("%s\n", "terminating");
-        terminate_process(node);
+        // terminate_process(node);
         return true;
       }
       else
@@ -348,29 +346,36 @@ bool execute_process(struct QueueNode *node, int quanta)
         else
         {
           // search for lru
-          int victimFrame;
-          int max_age = -10;
+          // int victimFrame;
+          // int max_age = -10;
 
-          // printf("has fault %s\n", pcb->progname);
+          // print_ready_queue();
 
-          struct QueueNode *temp = node;
-          struct PCB *whichPCB = pcb;
-          int whichIndex = 0;
-          while (temp != NULL)
-          {
-            for (int v = 0; v < temp->pcb->page_table_size; v++)
-            {
-              // printf("frame %d age %d\n", pcb->page_table[v].frame, pcb->page_table[v].last_used);
-              if (temp->pcb->page_table[v].last_used > max_age)
-              {
-                max_age = temp->pcb->page_table[v].last_used;
-                victimFrame = temp->pcb->page_table[v].frame;
-                whichPCB = temp->pcb;
-                whichIndex = v;
-              }
-            }
-            temp = temp->next;
-          }
+          // struct QueueNode *temp = head_node == NULL ? node : head_node;
+          // // struct QueueNode *temp = node;
+          // struct PCB *whichPCB = temp->pcb;
+          // // struct PCB *whichPCB = node;
+          // int whichIndex = 0;
+          // int searched = 0;
+          // // this isn't searching all the pcbs properly. its only searching the ones right after the current one
+          // while (temp != NULL)
+          // {
+          //   printf("searched %d\n", searched);
+          //   searched++;
+          //   for (int v = 0; v < temp->pcb->page_table_size; v++)
+          //   {
+          //     // printf("frame %d age %d\n", pcb->page_table[v].frame, pcb->page_table[v].last_used);
+          //     if (temp->pcb->page_table[v].last_used > max_age)
+          //     {
+          //       max_age = temp->pcb->page_table[v].last_used;
+          //       victimFrame = temp->pcb->page_table[v].frame;
+          //       whichPCB = temp->pcb;
+          //       whichIndex = v;
+          //     }
+          //   }
+          //   temp = temp->next;
+          // }
+
           // for (int v = 0; v < 10; v++)
           // {
           //   // printf("frame %d age %d\n", pcb->page_table[v].frame, pcb->page_table[v].last_used);
@@ -381,9 +386,17 @@ bool execute_process(struct QueueNode *node, int quanta)
           //   }
           // }
 
+          // printf("curr prog is %s\n", pcb->progname);
+          // printf("last used is %s at entry %d at frame %d\n", whichPCB->progname, whichIndex, victimFrame);
+
           // printShellMemory();
 
           // printf("working with %s\n", pcb->progname);
+          struct LRU_frame *lru = find_lru();
+          lru = find_lru();
+          int victimFrame = lru->victimFrame;
+          struct PCB *whichPCB = lru->pcb;
+          int whichIndex = lru->page_index;
 
           printf("%s\n\n", "Page fault! Victim page contents:");
 
@@ -414,6 +427,8 @@ bool execute_process(struct QueueNode *node, int quanta)
           pcb->page_table[pcb->program_counter / 3].frame = victimFrame;
           pcb->page_table[pcb->program_counter / 3].valid = 1;
           pcb->page_table[pcb->program_counter / 3].last_used = 0;
+          
+          free(lru);
         }
         return false;
       }
@@ -443,8 +458,9 @@ void *scheduler_FCFS()
         break;
     }
     cur = ready_queue_pop_head();
+    struct QueueNode *head_node = ready_queue_get_head();
     unlock_queue();
-    execute_process(cur, MAX_INT);
+    execute_process(cur, MAX_INT, head_node);
   }
   if (multi_threading)
     pthread_exit(NULL);
@@ -466,8 +482,9 @@ void *scheduler_SJF()
         break;
     }
     cur = ready_queue_pop_shortest_job();
+    struct QueueNode *head_node = ready_queue_get_head();
     unlock_queue();
-    execute_process(cur, MAX_INT);
+    execute_process(cur, MAX_INT, head_node);
   }
   if (multi_threading)
     pthread_exit(NULL);
@@ -489,9 +506,10 @@ void *scheduler_AGING_alternative()
         break;
     }
     cur = ready_queue_pop_shortest_job();
+    struct QueueNode *head_node = ready_queue_get_head();
     ready_queue_decrement_job_length_score();
     unlock_queue();
-    if (!execute_process(cur, 1))
+    if (!execute_process(cur, 1, head_node))
     {
       lock_queue();
       ready_queue_add_to_head(cur);
@@ -520,6 +538,7 @@ void *scheduler_AGING()
         break;
     }
     cur = ready_queue_pop_head();
+    struct QueueNode *head_node = ready_queue_get_head();
     shortest = ready_queue_get_shortest_job_score();
     if (shortest < cur->pcb->job_length_score)
     {
@@ -529,7 +548,7 @@ void *scheduler_AGING()
     }
     ready_queue_decrement_job_length_score();
     unlock_queue();
-    if (!execute_process(cur, 1))
+    if (!execute_process(cur, 1, head_node))
     {
       lock_queue();
       ready_queue_add_to_head(cur);
@@ -566,16 +585,22 @@ void *scheduler_RR(void *arg)
         break;
     }
     // printf("%d\n", 3);
+    struct QueueNode *head_node = ready_queue_get_head();
     cur = ready_queue_pop_head();
+    
+    // printf("rr head node is %s\n", head_node->pcb->progname);
     // printf("cur is %d at %d\n", cur->pcb->page_table, cur->pcb->program_counter);
+    // printf("on %s, head is now %s\n", cur->pcb->progname, ready_queue_get_head()->pcb->progname);
     unlock_queue();
     // printf("%d\n", 4);
-    if (!execute_process(cur, quanta))
+    if (!execute_process(cur, quanta, head_node))
     {
       lock_queue();
       // printf("%s\n", "here");
       // printf("%d\n", 5);
+      // print_ready_queue();
       ready_queue_add_to_tail(cur); // if program not finished, stick it back into the queue
+      // print_ready_queue();
       unlock_queue();
     }
   }
