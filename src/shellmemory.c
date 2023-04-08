@@ -109,10 +109,8 @@ char *mem_get_command(char *var_in)
   // only search variable store
   for (int i = 0; i < var_store_start; i++)
   {
-    // printf("%s %s\n", shellmemory[i].var, shellmemory[i].value);
     if (strcmp(shellmemory[i].var, var_in) == 0)
     {
-      // printf("%s\n", "found");
       return strdup(shellmemory[i].value);
     }
   }
@@ -135,115 +133,6 @@ void printShellMemory()
   }
   printf("\n\t%d lines in total, %d lines in use, %d lines free\n\n", SHELL_MEM_LENGTH, SHELL_MEM_LENGTH - count_empty, count_empty);
 }
-
-void show_var_section()
-{
-
-  printf("%s\n","------------------------");
-  printf(" var_sectionStart = %d \n", var_store_start);
-  int i;
-  for (i = var_store_start; i < SHELL_MEM_LENGTH; i++)
-  {
-    if (strcmp(shellmemory[i].var, "none") != 0)
-    {
-      printf("index = %d/%d  %s=%s\n", i, SHELL_MEM_LENGTH, shellmemory[i].var, shellmemory[i].value);
-    }
-  }
-
-  printf("%s\n","------------------------	");
-}
-
-/*
- * Function:  addFileToMem
- * 	Added in A2
- * --------------------
- * Load the source code of the file fp into the shell memory:
- * 		Loading format - var stores fileID, value stores a line
- *		Note that the first 100 lines are for set command, the rests are for run and exec command
- *
- *  pStart: This function will store the first line of the loaded file
- * 			in shell memory in here
- *	pEnd: This function will store the last line of the loaded file
-      in shell memory in here
- *  fileID: Input that need to provide when calling the function,
-      stores the ID of the file
-
-    modification -- Load into frame memory at first available spot, three lines at a time
- *
- * returns: error code, 21: no space left
- */
-// int load_file(FILE *fp, int *pStart, int *pEnd, char *filename)
-// {
-//   char *line;
-//   size_t i;
-//   int error_code = 0;
-//   bool hasSpaceLeft = false;
-//   bool flag = true;
-//   i = 101;
-//   size_t candidate;
-
-//   while (flag)
-//   {
-//     flag = false;
-//     for (i; i < var_store_start; i++)
-//     {
-//       if (strcmp(shellmemory[i].var, "none") == 0)
-//       {
-//         *pStart = (int)i;
-//         hasSpaceLeft = true;
-//         break;
-//       }
-//     }
-//     candidate = i;
-//     for (i; i < var_store_start; i++)
-//     {
-//       if (strcmp(shellmemory[i].var, "none") != 0)
-//       {
-//         flag = true;
-//         break;
-//       }
-//     }
-//   }
-//   i = candidate;
-//   // shell memory is full
-//   if (hasSpaceLeft == 0)
-//   {
-//     error_code = 21;
-//     return error_code;
-//   }
-
-//   for (size_t j = i; j < var_store_start; j++)
-//   {
-//     if (feof(fp))
-//     {
-//       *pEnd = (int)j - 1;
-//       break;
-//     }
-//     else
-//     {
-//       line = calloc(1, var_store_start);
-//       fgets(line, 999, fp);
-//       shellmemory[j].var = strdup(filename);
-//       shellmemory[j].value = strndup(line, strlen(line));
-//       free(line);
-//     }
-//   }
-
-//   // no space left to load the entire file into shell memory
-//   if (!feof(fp))
-//   {
-//     error_code = 21;
-//     // clean up the file in memory
-//     for (int j = 1; i <= var_store_start; i++)
-//     {
-//       shellmemory[j].var = "none";
-//       shellmemory[j].value = "none";
-//     }
-//     return error_code;
-//   }
-//   // printShellMemory();
-//   return error_code;
-// }
 
 int load_file(FILE *fp, int *pStart, int *pEnd, char *filename)
 {
@@ -314,7 +203,6 @@ int load_file(FILE *fp, int *pStart, int *pEnd, char *filename)
     }
     return error_code;
   }
-  // printShellMemory();
   return error_code;
 }
 
@@ -324,11 +212,9 @@ int get_free_page_frame()
   int i;
   int free_index = 0;
   int free_count = 0; // needs to reach 3 to count as a free spot
-  // printf("finding");
 
   for (i = 0; i < var_store_start; i++)
   {
-    // printf("%s\n", shellmemory[i].value);
     if (strcmp(shellmemory[i].var, "none") == 0)
     {
       free_count++;
@@ -340,7 +226,6 @@ int get_free_page_frame()
     }
     if (free_count == 3)
     {
-      // printf("%d\n", free_index);
       return free_index;
     }
   }
@@ -359,7 +244,6 @@ int mem_set_by_index(int index, char *var_key, char *val) {
 
 char *mem_get_value_at_line(int index)
 {
-  // printf("getting line at %d\n", index);
   if (index < 0 || index > SHELL_MEM_LENGTH)
     return "";
   return shellmemory[index].value;
@@ -381,20 +265,3 @@ void mem_free_lines_between(int start, int end)
     shellmemory[i].value = "none";
   }
 }
-
-
-// reset a chunk of memory
-// int mem_clean_out_block(int start, int num_instructions)
-// {
-//   int i;
-//   for (i = 0; i < num_instructions; i++)
-//   {
-//     if (strcmp(shellmemory[start + i].var, "none") == 0)
-//     {
-//       printf("Missing instructions");
-//       return -1;
-//     }
-//     shellmemory[start + i].var = "none";
-//     shellmemory[start + i].value = "none";
-//   }
-// }

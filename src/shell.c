@@ -62,7 +62,6 @@ int main(int argc, char *argv[])
   printf("Frame Store Size = %d; Variable Store Size = %d\n", frameSize, varMemSize);
 
   // create backing store
-  // printf("%s\n","done mem init");
   create_backing_store();
 
   while (1)
@@ -132,7 +131,6 @@ int parseInput(char *ui)
 
 int create_backing_store()
 {
-  // printf("%s\n", "in create b store");
   char *dir = "backing_store";
 
   if (opendir(dir) != NULL)
@@ -170,7 +168,6 @@ int copy_file(char *filename, char *new_filename) {
 
   while (fgets(prog_line, sizeof(prog_line), program) != NULL)
   {
-    // printf("%s\n", prog_line);
     char *semi_c_index = strchr(prog_line, ';');
     if (semi_c_index != NULL)
     {

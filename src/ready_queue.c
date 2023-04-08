@@ -31,6 +31,7 @@ void ready_queue_destory()
 
 void ready_queue_add_to_tail(struct QueueNode *node)
 {
+  // add the program to list of nodes if not already in list and there is space
   int does_contain = -1;
   int node_count = 0;
   int first_null_index = -1;
@@ -52,17 +53,11 @@ void ready_queue_add_to_tail(struct QueueNode *node)
       }
     }
   }
-  // for (int i = 0; i < 3; i++) {
-  //   if (all_nodes[i] != NULL) {
-  //     printf("%d %s\n", i, all_nodes[i]->pcb->progname);
-  //   }
-  // }
-
-  // if not already in list and there is space, add
   if (does_contain == -1 && node_count < 3)
   {
     all_nodes[first_null_index] = node;
   }
+
   if (!head)
   {
     head = node;
@@ -78,33 +73,9 @@ void ready_queue_add_to_tail(struct QueueNode *node)
   }
 }
 
-// void age_all_nodes(struct PCB *curr_pcb, int curr_frame)
-// {
-//   // printf("%s\n", "now aging");
-//   for (int i = 0; i < 3; i++)
-//   {
-//     if (all_nodes[i] != NULL)
-//     {
-//       struct QueueNode *curr_node = all_nodes[i];
-//       for (int j = 0; j < curr_node->pcb->page_table_size; j++)
-//       {
-//         if ((curr_node->pcb->pid != curr_pcb->pid) || (curr_node->pcb->page_table[i].frame != curr_frame))
-//         {
-//           if ((curr_node->pcb->page_table[j].last_used != -1))
-//           {
-//             // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
-//             curr_node->pcb->page_table[j].last_used = curr_node->pcb->page_table[j].last_used + 1;
-//           }
-//         }
-//       }
-//     }
-//   }
-//   // printf("%s\n", "done aging");
-// }
-
-void age_all_nodes(struct PCB *curr_pcb, int curr_frame)
+// increase the age of all frames in every PCB by 1
+void age_all_nodes()
 {
-  // printf("%s\n", "now aging");
   for (int i = 0; i < 3; i++)
   {
     if (all_nodes[i] != NULL)
@@ -112,18 +83,16 @@ void age_all_nodes(struct PCB *curr_pcb, int curr_frame)
       struct QueueNode *curr_node = all_nodes[i];
       for (int j = 0; j < curr_node->pcb->page_table_size; j++)
       {
-          if ((curr_node->pcb->page_table[j].last_used != -1))
-          {
-            // printf("aging up %s %d, is %d\n", pcb->progname, pcb->page_table[f].frame, pcb->page_table[f].last_used);
-            curr_node->pcb->page_table[j].last_used = curr_node->pcb->page_table[j].last_used + 1;
-          }
-        
+        if ((curr_node->pcb->page_table[j].last_used != -1))
+        {
+          curr_node->pcb->page_table[j].last_used = curr_node->pcb->page_table[j].last_used + 1;
+        }
       }
     }
   }
-  // printf("%s\n", "done aging");
 }
 
+// print the ages of all the frames of each PCB node
 void print_node_ages()
 {
   for (int i = 0; i < 3; i++)
@@ -186,14 +155,6 @@ void ready_queue_add_to_head(struct QueueNode *node)
   }
 }
 
-struct QueueNode *ready_queue_get_head()
-{
-  // if (head == NULL) {
-  //   printf("%s\n", "head is null");
-  // }
-  return head;
-}
-
 void print_ready_queue()
 {
   if (!head)
@@ -225,7 +186,6 @@ void terminate_process(struct QueueNode *node)
     }
   }
 
-  // printf("%s\n", "terminated");
   free(node);
 }
 
@@ -239,7 +199,6 @@ struct QueueNode *ready_queue_pop_head()
   struct QueueNode *tmp = head;
   if (head != NULL)
     head = head->next;
-  // printf("popped %d at %d\n", tmp->pcb->pid, tmp->pcb->program_counter);
   return tmp;
 }
 

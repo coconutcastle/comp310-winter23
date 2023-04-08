@@ -406,7 +406,6 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
   // copy all program files into backing store and load code with them
   for (int i = 0; i < 3; i++)
   {
-
     if (fnames[i] != NULL)
     {
       char prog_filename[100];
@@ -422,18 +421,12 @@ int exec(char *fname1, char *fname2, char *fname3, char *policy, bool background
       // initialize PCB with copied program
       error_code = process_initialize(prog_filename, fnames[i], line_count);
 
-      // printf("%s\n", "done init process");
-
       if (error_code != 0)
       {
         return handleError(error_code);
       }
     }
   }
-
-  // printf("%s\n", "begin scheduling");
-  // print_ready_queue();
-  // printShellMemory();
 
   error_code = schedule_by_policy(policy, mt);
   if (error_code == 15)
