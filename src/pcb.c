@@ -24,8 +24,6 @@ struct PCB *makePCB(int num_lines, char *filename, char *progname, int page_tabl
   newPCB->page_table_size = 15;
   newPCB->num_blank_lines = 0;
 
-  // printf("made pcb with numlines %d\n", num_lines);
-
   // create frame table, all invalid for now
   for (int i = 0; i < newPCB->page_table_size; i++)
   {
