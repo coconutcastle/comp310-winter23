@@ -105,7 +105,7 @@ void print_node_ages()
 
         if ((curr_node->pcb->page_table[j].last_used != -1))
         {
-          printf("program %s, frame %d, age %d\n", curr_node->pcb->progname, curr_node->pcb->page_table[j].frame, curr_node->pcb->page_table[j].last_used);
+          printf("program %s, frame %d, age %d\n", curr_node->pcb->progname, curr_node->pcb->page_table[j].loc, curr_node->pcb->page_table[j].last_used);
         }
       }
     }
@@ -131,7 +131,7 @@ struct LRU_frame *find_lru()
         if (curr_node->pcb->page_table[j].last_used > max_age)
         {
           max_age = curr_node->pcb->page_table[j].last_used;
-          lru->victimFrame = curr_node->pcb->page_table[j].frame;
+          lru->victimFrame = curr_node->pcb->page_table[j].loc;
           lru->pcb = curr_node->pcb;
           lru->page_index = j;
         }
@@ -180,9 +180,9 @@ void terminate_process(struct QueueNode *node)
 
   for (int i = 0; i < node->pcb->page_table_size; i++)
   {
-    if (page[i].frame != -1)
+    if (page[i].loc != -1)
     {
-      mem_free_lines_between(page[i].frame * 3, (page[i].frame * 3) + 2);
+      mem_free_lines_between(page[i].loc * 3, (page[i].loc * 3) + 2);
     }
   }
 

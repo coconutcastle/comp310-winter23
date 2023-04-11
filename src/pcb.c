@@ -27,7 +27,7 @@ struct PCB *makePCB(int num_lines, char *filename, char *progname, int page_tabl
   // create frame table, all invalid for now
   for (int i = 0; i < newPCB->page_table_size; i++)
   {
-    newPCB->page_table[i].frame = -1;
+    newPCB->page_table[i].loc = -1;
     newPCB->page_table[i].last_used = -1;
   }
 

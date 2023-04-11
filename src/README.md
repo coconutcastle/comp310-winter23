@@ -34,14 +34,23 @@ To run batch mode with one of the test case text files, run `./mysh < ../testcas
 All the test cases were run and checked using the following commands:
 
 make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc1.txt > tc1.txt;diff -w tc1.txt ../testcases/assignment3/T_tc1_result.txt
+
 make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc2.txt > tc2.txt;diff -w tc2.txt ../testcases/assignment3/T_tc2_result.txt
+
 make clean;make mysh framesize=21 varmemsize=10;./mysh < ../testcases/assignment3/T_tc3.txt > tc3.txt;diff -w tc3.txt ../testcases/assignment3/T_tc3_result.txt
+
 make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc4.txt > tc4.txt;diff -w tc4.txt ../testcases/assignment3/T_tc4_result.txt
+
 make clean;make mysh framesize=6 varmemsize=10;./mysh < ../testcases/assignment3/T_tc5.txt > tc5.txt;diff -w tc5.txt ../testcases/assignment3/T_tc5_result.txt
+
 make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc6.txt > tc6.txt;diff -w tc6.txt ../testcases/assignment3/T_tc6_result.txt
+
 make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc7.txt > tc7.txt;diff -w tc7.txt ../testcases/assignment3/T_tc7_result.txt
+
 make clean;make mysh framesize=21 varmemsize=10;./mysh < ../testcases/assignment3/T_tc8.txt > tc8.txt;diff -w tc8.txt ../testcases/assignment3/T_tc8_result.txt
+
 make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc9.txt > tc9.txt;diff -w tc9.txt ../testcases/assignment3/T_tc9_result.txt
+
 make clean;make mysh framesize=6 varmemsize=10;./mysh < ../testcases/assignment3/T_tc10.txt > tc10.txt;diff -w tc10.txt ../testcases/assignment3/T_tc10_result.txt
 
 The tests all pass locally using the above commands.

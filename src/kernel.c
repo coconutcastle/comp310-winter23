@@ -117,13 +117,13 @@ bool execute_process(struct QueueNode *node, int quanta)
     int page_num = (pcb->program_counter) / 3;
     struct Page *curr_page = &(pcb->page_table[page_num]);
 
-    if (curr_page->frame != -1)
+    if (curr_page->loc != -1)
     {
       // age all other frames in all PCBs, then set current frame age to 0
       age_all_nodes();
       curr_page->last_used = 0;
 
-      int mem_loc = ((curr_page->frame) * 3) + ((pcb->program_counter) % 3);
+      int mem_loc = ((curr_page->loc) * 3) + ((pcb->program_counter) % 3);
       line = mem_get_value_at_line(mem_loc);
 
       if (strlen(line) > 0 && strcmp(line, "none") != 0) // check if blank line or invalid line return
@@ -175,15 +175,12 @@ bool execute_process(struct QueueNode *node, int quanta)
           // find lru frame
           struct LRU_frame *lru = find_lru();
           lru = find_lru();
-          int victimFrame = lru->victimFrame;
-          struct PCB *whichPCB = lru->pcb;
-          int whichIndex = lru->page_index;
 
           printf("%s\n\n", "Page fault! Victim page contents:");
 
           for (int v = 0; v < 3; v++)
           {
-            char *victim_line = mem_get_value_at_line((victimFrame * 3) + v);
+            char *victim_line = mem_get_value_at_line((lru->victimFrame * 3) + v);
 
             if (strlen(victim_line) > 0 && strcmp(victim_line, "none") != 0)
             {
@@ -192,19 +189,19 @@ bool execute_process(struct QueueNode *node, int quanta)
           }
           printf("\n%s\n", "End of victim page contents.");
 
-          whichPCB->page_table[whichIndex].frame = -1;
-          whichPCB->page_table[whichIndex].last_used = -1;
-
           // evict frame
-          mem_free_lines_between(victimFrame * 3, (victimFrame * 3) + 2);
+          mem_free_lines_between(lru->victimFrame * 3, (lru->victimFrame * 3) + 2);
+
+          lru->pcb->page_table[lru->page_index].loc = -1;
+          lru->pcb->page_table[lru->page_index].last_used = -1;
 
           // load new frame into evicted frame spot
           for (int v = 0; v < 3; v++)
           {
-            mem_set_by_index((victimFrame * 3) + v, pcb->progname, commands[v]);
+            mem_set_by_index((lru->victimFrame * 3) + v, pcb->progname, commands[v]);
           }
 
-          pcb->page_table[pcb->program_counter / 3].frame = victimFrame;
+          pcb->page_table[pcb->program_counter / 3].loc = lru->victimFrame;
           pcb->page_table[pcb->program_counter / 3].last_used = 0;
 
           free(lru);
@@ -509,6 +506,6 @@ int put_frame_in_memory(struct PCB *pcb, char *commands[], int frame_index, int 
     mem_set_by_index(mem_loc + j, page_line_name, commands[(commands_start * 3) + j]);
   }
 
-  pcb->page_table[frame_index].frame = mem_loc / 3;
+  pcb->page_table[frame_index].loc = mem_loc / 3;
   pcb->page_table[frame_index].last_used = 0;
 }

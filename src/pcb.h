@@ -4,7 +4,7 @@
 
 struct Page
 {
-  int frame;        // frame in memory - multiply by 3 to get mem location
+  int loc;        // frame in memory - multiply by 3 to get mem location
   int last_used;    // the longer its been since its been accessed, the larger the number gets
 };
 
