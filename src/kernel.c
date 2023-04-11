@@ -174,7 +174,6 @@ bool execute_process(struct QueueNode *node, int quanta)
         {
           // find lru frame
           struct LRU_frame *lru = find_lru();
-          lru = find_lru();
 
           printf("%s\n\n", "Page fault! Victim page contents:");
 

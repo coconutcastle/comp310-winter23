@@ -44,7 +44,8 @@ int parseInput(char ui[]);
 // make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment3/T_tc9.txt > tc9.txt;diff -w tc9.txt ../testcases/assignment3/T_tc9_result.txt
 // make clean;make mysh framesize=6 varmemsize=10;./mysh < ../testcases/assignment3/T_tc10.txt
 // make clean;make mysh framesize=6 varmemsize=10;./mysh < ../testcases/assignment3/T_tc10.txt > tc10.txt;diff -w tc10.txt ../testcases/assignment3/T_tc10_result.txt
-// valgrind --leak-check=yes make mysh fsize=500 vsize=500
+// make clean;make mysh framesize=18 varmemsize=10;
+// valgrind --leak-check=yes  --show-leak-kinds=all -s ./mysh < ../testcases/assignment3/T_tc4.txt
 int main(int argc, char *argv[])
 {
   printf("%s\n", "Shell version 1.2 Created January 2023\n");
@@ -163,32 +164,21 @@ int copy_file(char *filename, char *new_filename)
   int line_count = 0;
   char prog_line[1000];
 
+  // go through file line by line, then each line character by character - insert new line if semicolon
   while (fgets(prog_line, sizeof(prog_line), program) != NULL)
   {
-    char *semi_c_index = strchr(prog_line, ';');
-    if (semi_c_index != NULL)
+    for (int i = 0; i < strlen(prog_line); i++)
     {
-      char *token = strtok(prog_line, ";");
-      int token_count = 0;
-
-      while (token != NULL)
+      if (prog_line[i] == ';')
       {
-        if (token_count > 0)
-        {
-          fprintf(file, "%s", token);
-        }
-        else
-        {
-          fprintf(file, "%s\n", token);
-        }
-        token = strtok(NULL, ";");
+        fputs("\n", file);
         line_count++;
-        token_count++;
       }
-      continue;
+      else
+      {
+        fputc(prog_line[i], file);
+      }
     }
-
-    fprintf(file, "%s", prog_line);
     line_count++;
   }
   fclose(file);

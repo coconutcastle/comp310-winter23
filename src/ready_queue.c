@@ -12,7 +12,7 @@
 #include "ready_queue.h"
 
 struct QueueNode *head = NULL;
-struct QueueNode *all_nodes[3] = {NULL, NULL, NULL};
+struct QueueNode *all_nodes[3] = {NULL, NULL, NULL};    // gonna assume no more than 3 programs at once
 
 void ready_queue_destory()
 {
@@ -113,6 +113,7 @@ void print_node_ages()
 }
 
 // iterate through list of all PCB nodes and their frames to find the least recently used
+// honestly not the most efficient way of managing the lru but it does work at least
 struct LRU_frame *find_lru()
 {
   struct LRU_frame *lru = malloc(sizeof(struct LRU_frame));
