@@ -48,90 +48,29 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
   node->pcb = newPCB;
 
   lock_queue();
-  // store 2 pages into frame store
 
-  // char *lines[6]; // you only load 6 lines initially
-  // int line_counter = 0;
-  // int blanks_counter = 0;
-  // char line[100];
+  // store 2 pages into frame store, or 6 lines
+  char *commands[6];
 
-  // // print_ready_queue();
+  int line_counter = get_lines_from_file(newPCB, commands, 6, 1);
+  int blanks_counter = line_counter > 3 ? 6 - line_counter : 3 - line_counter;
 
-  // // go through all lines in file
-  // while (fgets(line, sizeof(line), fp) != NULL)
-  // {
-  //   if (line_counter < 6 && line_counter <= num_lines)
-  //   {
-  //     // only load the first 2 pages (2 * 3 lines = 6 lines)
-  //     line_counter++;
-  //     lines[line_counter - 1] = strdup(line);
-  //     memset(line, 0, sizeof(line));
-  //   }
-  // }
+  if (line_counter > 0)
+  {
+    int page_index_table = ((line_counter - 1) / 3); // will either be 0 or 1
 
-  // if (line_counter > 0)
-  // {
-  //   int page_index_table = ((line_counter - 1) / 3); // will either be 0 or 1
-
-  //   // if number of lines stored hasn't reached 3, pad with empty lines
-  //   if (line_counter % 3 != 0)
-  //   {
-  //     for (int i = line_counter; i < (page_index_table + 1) * 3; i++)
-  //     {
-  //       blanks_counter++;
-  //       lines[i] = "\0";
-  //     }
-  //   }
-
-  //   // print_ready_queue();
-
-  //   // now put full pages in memory
-
-  //   for (int i = 0; i <= page_index_table; i++)
-  //   {
-  //     // get first free spot
-  //     int page_index = get_free_page_frame();
-  //     if (page_index != -1)
-  //     {
-  //       char page_name[20];
-  //       snprintf(page_name, 20, "-%d", i);
-
-  //       // put all lines for this page in
-  //       for (int j = 0; j < 3; j++)
-  //       {
-  //         char line_name[20];
-  //         char page_line_name[100];
-
-  //         snprintf(line_name, 20, "-%d", j);
-
-  //         strcpy(page_line_name, prog_name);
-  //         strcat(page_line_name, page_name);
-  //         strcat(page_line_name, line_name);
-
-  //         // printf("setting to %s\n", page_line_name);
-  //         // printf("set to %d %d\n", page_index, j);
-
-  //         mem_set_by_index(page_index + j, page_line_name, lines[(i * 3) + j]);
-  //       }
-
-  //       newPCB->page_table[i].frame = page_index / 3;
-  //       newPCB->page_table[i].valid = 1;
-  //       newPCB->page_table[i].last_used = 0;
-
-  //       // print_ready_queue();
-
-  //       // printf("pc is %d\n", newPCB->program_counter);
-
-  //       // printf("done setting %d at %d w %d\n", newPCB->page_table[i].frame, i, page_index);
-  //     }
-  //   }
-  //   newPCB->num_blank_lines = blanks_counter;
-  // }
-
-  // print_ready_queue();
-  // printShellMemory();
-
-  int in_frame_code = insert_frame(fp, newPCB, prog_name, 6, num_lines, 0);
+    // now put full pages in memory
+    for (int i = 0; i <= page_index_table; i++)
+    {
+      // get first free spot
+      int page_index = get_free_page_frame();
+      if (page_index != -1)
+      {
+        int insert_success = put_frame_in_memory(newPCB, commands, i, page_index, 1);
+      }
+    }
+    newPCB->num_blank_lines = newPCB->num_blank_lines + blanks_counter;
+  }
 
   ready_queue_add_to_tail(node);
 
@@ -218,43 +157,17 @@ bool execute_process(struct QueueNode *node, int quanta)
       }
       else
       {
-        FILE *file = fopen(node->pcb->filename, "rt");
+        // get the missing page (one single page, 3 lines)
+        char *commands[3];
 
-        // get the missing page (one single page)
-        char *lines[3];
-        int all_lines_counter = 0;
-        int char_lines_counter = 0;
-        int blanks_counter = 0;
-        char line[100];
-
-        // go through all lines in file
-        while (fgets(line, sizeof(line), file) != NULL)
-        {
-          all_lines_counter++;
-          if (all_lines_counter > pcb->program_counter && char_lines_counter < 3)
-          {
-            char_lines_counter++;
-            lines[char_lines_counter - 1] = strdup(line);
-            memset(line, 0, sizeof(line));
-          }
-        }
-
-        fclose(file);
-
-        if (char_lines_counter < 3)
-        {
-          for (int c = char_lines_counter; c < 3; c++)
-          {
-            blanks_counter++;
-            lines[c] = "\0";
-          }
-        }
+        int line_counter = get_lines_from_file(pcb, commands, 3, 0);
+        int blanks_counter = 3 - line_counter;
 
         // get first free spot
         int page_index = get_free_page_frame();
         if (page_index != -1)
         {
-          int insert_success = put_frame_in_memory(pcb, lines, pcb->program_counter / 3, page_index, 0);
+          int insert_success = put_frame_in_memory(pcb, commands, pcb->program_counter / 3, page_index, 0);
           pcb->num_blank_lines = pcb->num_blank_lines + blanks_counter;
         }
         else
@@ -288,7 +201,7 @@ bool execute_process(struct QueueNode *node, int quanta)
           // load new frame into evicted frame spot
           for (int v = 0; v < 3; v++)
           {
-            mem_set_by_index((victimFrame * 3) + v, pcb->progname, lines[v]);
+            mem_set_by_index((victimFrame * 3) + v, pcb->progname, commands[v]);
           }
 
           pcb->page_table[pcb->program_counter / 3].frame = victimFrame;
@@ -542,63 +455,50 @@ int schedule_by_policy(char *policy, bool mt)
   }
 }
 
-int insert_frame(FILE *fp, struct PCB *pcb, char *prog_name, int max_lines, int num_lines, int condition)
+// returns the number of lines copied;
+int get_lines_from_file(struct PCB *pcb, char *commands[], int max_lines, int condition)
 {
+  FILE *file = fopen(pcb->filename, "rt");
 
-  char *lines[max_lines]; // you only load 6 lines initially
-  int line_counter = 0;
+  // get the missing page (one single page)
   int all_lines_counter = 0;
-  int blanks_counter = 0;
-  char line[100];
-
-  // if condition = 0, adding frame for first time, only load the first 2 pages (2 * 3 lines = 6 lines)
-  // if condition = 1, adding in frame after the fact and need to start adding lines after the already executed ones
+  int line_counter = 0;
+  char command[100];
 
   // go through all lines in file
-  while (fgets(line, sizeof(line), fp) != NULL)
+  while (fgets(command, sizeof(command), file) != NULL)
   {
-    bool eval_cond = condition == 0 ? (line_counter < max_lines && line_counter <= num_lines) : (all_lines_counter > pcb->program_counter && line_counter < 3);
+    all_lines_counter++;
+
+    // where to start copying lines changes depending if part of initial frame add or after during execute
+    // if condition = 1, adding frame for first time, only load the first 2 pages (2 * 3 lines = 6 lines)
+    // if condition = 0, adding in frame after the fact and need to start adding lines after the already executed ones
+    bool eval_cond = condition == 0 ? (all_lines_counter > pcb->program_counter && line_counter < 3) : (line_counter < max_lines && line_counter <= pcb->num_lines);
     if (eval_cond)
     {
       line_counter++;
-      lines[line_counter - 1] = strdup(line);
-      memset(line, 0, sizeof(line));
+      commands[line_counter - 1] = strdup(command);
     }
   }
 
-  if (line_counter > 0)
+  fclose(file);
+
+  if (line_counter > 0 && line_counter % 3 != 0)
   {
-    int page_index_table = ((line_counter - 1) / 3); // will either be 0 or 1
-
-    // if number of lines stored hasn't reached 3, pad with empty lines
-    if (line_counter % 3 != 0)
+    int page_num = ((line_counter - 1) / 3); // will either be 0 or 1
+    for (int c = line_counter; c < (page_num + 1) * 3; c++)
     {
-      for (int i = line_counter; i < (page_index_table + 1) * 3; i++)
-      {
-        blanks_counter++;
-        lines[i] = "\0";
-      }
+      commands[c] = "\0";
     }
-
-    // now put full pages in memory
-    for (int i = 0; i <= page_index_table; i++)
-    {
-      // get first free spot
-      int page_index = get_free_page_frame();
-      if (page_index != -1)
-      {
-        int insert_success = put_frame_in_memory(pcb, lines, i, page_index, 1);
-      }
-    }
-    pcb->num_blank_lines = pcb->num_blank_lines + blanks_counter;
   }
+  return line_counter;
 }
 
-int put_frame_in_memory(struct PCB *pcb, char *lines[], int frame_index, int mem_loc, int is_new)
+int put_frame_in_memory(struct PCB *pcb, char *commands[], int frame_index, int mem_loc, int is_new)
 {
   char page_name[20];
   snprintf(page_name, 20, "-%d", frame_index);
-  int lines_start = is_new == 0 ? 0 : frame_index;    // if part of initial insert or while executing proess
+  int commands_start = is_new == 0 ? 0 : frame_index; // if part of initial insert or while executing proess
 
   // put all lines for this page in memory
   for (int j = 0; j < 3; j++)
@@ -606,7 +506,7 @@ int put_frame_in_memory(struct PCB *pcb, char *lines[], int frame_index, int mem
     char page_line_name[100];
     snprintf(page_line_name, 100, "%s%s-%d", pcb->progname, page_name, j);
 
-    mem_set_by_index(mem_loc + j, page_line_name, lines[(lines_start * 3) + j]);
+    mem_set_by_index(mem_loc + j, page_line_name, commands[(commands_start * 3) + j]);
   }
 
   pcb->page_table[frame_index].frame = mem_loc / 3;
