@@ -50,7 +50,7 @@ int process_initialize(char *filename, char *prog_name, int num_lines)
   lock_queue();
 
   // store 2 pages into frame store, or 6 lines
-  char *commands[6];
+  char *commands[6] = {"\0", "\0", "\0", "\0", "\0", "\0"};   // initialize with blank lines and fill them in
 
   int line_counter = get_lines_from_file(newPCB, commands, 6, 1);
   int blanks_counter = line_counter > 3 ? 6 - line_counter : 3 - line_counter;
@@ -158,7 +158,7 @@ bool execute_process(struct QueueNode *node, int quanta)
       else
       {
         // get the missing page (one single page, 3 lines)
-        char *commands[3];
+        char *commands[3] = {"\0", "\0", "\0"};   // initialize with blank lines and fill them in 
 
         int line_counter = get_lines_from_file(pcb, commands, 3, 0);
         int blanks_counter = 3 - line_counter;
@@ -479,14 +479,6 @@ int get_lines_from_file(struct PCB *pcb, char *commands[], int max_lines, int co
 
   fclose(file);
 
-  if (line_counter > 0 && line_counter % 3 != 0)
-  {
-    int page_num = ((line_counter - 1) / 3); // will either be 0 or 1
-    for (int c = line_counter; c < (page_num + 1) * 3; c++)
-    {
-      commands[c] = "\0";
-    }
-  }
   return line_counter;
 }
 
