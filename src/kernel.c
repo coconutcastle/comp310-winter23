@@ -145,12 +145,15 @@ bool execute_process(struct QueueNode *node, int quanta)
 
 				if ((pcb->program_counter) >= (pcb->num_lines + pcb->num_blank_lines))
 				{
-					parseInput(line);
+					if (strcmp(line, "\0") != 0 && line != NULL) {
+						parseInput(line);
+					}
 					in_background = false;
 					return true;
 				}
-
-				parseInput(line);
+				if (strcmp(line, "\0") != 0 && line != NULL) {
+					parseInput(line);
+				}
 				in_background = false;
 			}
 			pcb->program_counter = pcb->program_counter + 1;
@@ -477,7 +480,7 @@ int get_lines_from_file(struct PCB *pcb, char *commands[], int max_lines, int co
 	// get the missing page (one single page)
 	int all_lines_counter = 0;
 	int line_counter = 0;
-	char command[100];
+	char command[200];
 
 	// go through all lines in file
 	while (fgets(command, sizeof(command), file) != NULL)

@@ -82,7 +82,7 @@ void mem_set_value(char *var_in, char *value_in)
 			return;
 		}
 	}
-
+	
 	return;
 }
 
@@ -237,6 +237,7 @@ int mem_set_by_index(int index, char *var_key, char *val)
 	{
 		shellmemory[index].var = strdup(var_key);
 		shellmemory[index].value = strdup(val);
+		return 0;
 	}
 	else
 	{

@@ -16,6 +16,14 @@ struct QueueNode *all_nodes[3] = {NULL, NULL, NULL}; // gonna assume no more tha
 
 void ready_queue_destory()
 {
+	for (int i = 0; i < 3; i++) {
+		if (all_nodes[i] != NULL) {
+			free(all_nodes[i]->pcb->progname);
+			free(all_nodes[i]->pcb->filename);
+			free(all_nodes[i]->pcb);
+			free(all_nodes[i]);
+		}
+	}
 	if (!head)
 		return;
 	struct QueueNode *cur = head;
@@ -23,15 +31,9 @@ void ready_queue_destory()
 	while (cur->next != NULL)
 	{
 		tmp = cur->next;
-		free(cur->pcb->progname);
-		free(cur->pcb->filename);
-		free(cur->pcb);
 		free(cur);
 		cur = tmp;
 	}
-	free(cur->pcb->progname);
-	free(cur->pcb->filename);
-	free(cur->pcb);
 	free(cur);
 }
 

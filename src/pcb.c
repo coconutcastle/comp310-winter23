@@ -11,7 +11,6 @@ int generatePID()
 	return pid_counter++;
 }
 
-// In this implementation, Pid is the same as file ID
 struct PCB *makePCB(int num_lines, char *filename, char *progname, int page_table_size)
 {
 	struct PCB *newPCB = malloc(sizeof(struct PCB));

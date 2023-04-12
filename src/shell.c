@@ -147,9 +147,11 @@ int create_backing_store()
 int copy_file(char *filename, char *new_filename)
 {
 
-	char filepath[100];
-	strcpy(filepath, "../testcases/assignment3/");
-	strcat(filepath, filename);
+	char filepath[200];
+	// strcpy(filepath, "../testcases/assignment3/");
+	// strcat(filepath, filename);
+
+	snprintf(filepath, 200, "../testcases/assignment3/%s", filename);
 
 	// open program file
 	FILE *program = fopen(filepath, "rt");
