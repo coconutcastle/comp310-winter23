@@ -16,7 +16,7 @@ struct QueueNode *all_nodes[3] = {NULL, NULL, NULL}; // gonna assume no more tha
 
 void ready_queue_destory()
 {
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++) {		// since we don't free nodes when process terminates (to keep track of ages), freeing them all here instead
 		if (all_nodes[i] != NULL) {
 			free(all_nodes[i]->pcb->progname);
 			free(all_nodes[i]->pcb->filename);
@@ -24,7 +24,7 @@ void ready_queue_destory()
 			free(all_nodes[i]);
 		}
 	}
-	if (!head)
+	if (!head)		// not sure if these parts below here are necessary anymore
 		return;
 	struct QueueNode *cur = head;
 	struct QueueNode *tmp;

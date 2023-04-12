@@ -52,4 +52,6 @@ make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment
 
 make clean;make mysh framesize=6 varmemsize=10;./mysh < ../testcases/assignment3/T_tc10.txt > tc10.txt;diff -w tc10.txt ../testcases/assignment3/T_tc10_result.txt
 
-The tests all pass locally using the above commands. Since Autograder has stopped working, I cannot say whether or not this will run on the Mimi servers, or that it will compile there either. Please contact me if there are problems in this regard.
+The tests all pass locally using the above commands. The files in in the src folder with names `tc<test_num>.txt` contain the results of the most recent runs of the batched test commands. Since Autograder has stopped working, I cannot say whether or not this will run on the Mimi servers, or that it will compile there either. Please contact me if there are problems in this regard.
+
+Memory leaks were checked using the command `valgrind --leak-check=yes  --show-leak-kinds=all -s ./mysh < ../testcases/assignment3/T_tc<test_number>.txt `.
