@@ -271,6 +271,7 @@ int quit()
   printf("%s\n", "Bye!");
   threads_terminate();
   ready_queue_destory();
+  free_shell_memory();
   remove_backing_store();
   exit(0);
 }

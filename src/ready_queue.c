@@ -23,9 +23,15 @@ void ready_queue_destory()
   while (cur->next != NULL)
   {
     tmp = cur->next;
+    free(cur->pcb->progname);
+    free(cur->pcb->filename);
+    free(cur->pcb);
     free(cur);
     cur = tmp;
   }
+  free(cur->pcb->progname);
+  free(cur->pcb->filename);
+  free(cur->pcb);
   free(cur);
 }
 

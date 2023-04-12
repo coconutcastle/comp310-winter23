@@ -6,12 +6,11 @@
 
 This code uses the starter code from [the project repository](https://gitlab.cs.mcgill.ca/balmau/comp310-winter23). This assignment is built off of the A3 solution code provided.
 
-This code has never been successfully crawled by the Autograder due to an odd issue with an infinite loop - the source of which was only very recently discovered. Therefore, I cannot say for certain that there will be no compilation errors/warnings or issues that arise remotely but not locally. 
-
 Some other things:
 - Some code is taken from sources such as StackOverflow. These have been linked and credited in the comments.
-- I am unable to properly delete the backing_store directory that is created each time it is run, though the files contained within them are. I am not clear on what the issue is, as I don't have anything other than an error code. I suspect it may have to do with permissions.
+- The backing_store directory is occasionally not properly deleted, though the files contained within them are. I am not clear on what the issue is, as I don't have anything other than an error code. I suspect it may have to do with permissions.
 - The command line arguments for framesize and varmemsize can be set using framesize=X and varmemsize=X.
+- There are some memory leaks due to use of strdup() in the provided starter code. According to the comments on [this Ed post](https://edstem.org/us/courses/32167/discussion/2902283), so long as the program passes the tests and does not crash, we should not be getting penalized for memory leaks. I am working under this assumption.
 
 ## To Run
 
@@ -53,4 +52,4 @@ make clean;make mysh framesize=18 varmemsize=10;./mysh < ../testcases/assignment
 
 make clean;make mysh framesize=6 varmemsize=10;./mysh < ../testcases/assignment3/T_tc10.txt > tc10.txt;diff -w tc10.txt ../testcases/assignment3/T_tc10_result.txt
 
-The tests all pass locally using the above commands.
+The tests all pass locally using the above commands. Since Autograder has stopped working, I cannot say whether or not this will run on the Mimi servers, or that it will compile there either. Please contact me if there are problems in this regard.

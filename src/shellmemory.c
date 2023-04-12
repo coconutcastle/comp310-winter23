@@ -46,7 +46,6 @@ char *extract(char *model)
 void mem_init(int frameSize, int varMemSize)
 {
   // for this assignment, each frame has 3 lines
-  // for now, divide memory evenly between frame and variable store
   // shellmemory is still size 1000
   // assumes variable store starts directly after frame store
   var_store_start = frameSize;
@@ -236,7 +235,6 @@ int mem_set_by_index(int index, char *var_key, char *val) {
   if (strcmp(shellmemory[index].var, "none") == 0) {
     shellmemory[index].var = strdup(var_key);
     shellmemory[index].value = strdup(val);
-
   } else {
     return -1;
   }
@@ -258,6 +256,22 @@ void mem_free_lines_between(int start, int end)
       free(shellmemory[i].var);
     }
     if (shellmemory[i].value != NULL)
+    {
+      free(shellmemory[i].value);
+    }
+    shellmemory[i].var = "none";
+    shellmemory[i].value = "none";
+  }
+}
+
+void free_shell_memory() {
+  for (int i = 0; i < SHELL_MEM_LENGTH; i++)
+  {
+    if (shellmemory[i].var != NULL && strcmp(shellmemory[i].var, "none") != 0)
+    {
+      free(shellmemory[i].var);
+    }
+    if (shellmemory[i].value != NULL && strcmp(shellmemory[i].value, "none") != 0)
     {
       free(shellmemory[i].value);
     }
