@@ -5,15 +5,17 @@
 
 #define MAX_INT 2147483646
 
-struct QueueNode {
-    struct PCB *pcb;
-    struct QueueNode *next;
+struct QueueNode
+{
+	struct PCB *pcb;
+	struct QueueNode *next;
 };
 
-struct LRU_frame {
-  struct PCB *pcb;
-  int page_index;     // index of the frame in its specific PCB page table
-  int victimFrame;
+struct LRU_frame
+{
+	struct PCB *pcb;
+	int page_index; // index of the frame in its specific PCB page table
+	int victimFrame;
 };
 
 void ready_queue_destory();
